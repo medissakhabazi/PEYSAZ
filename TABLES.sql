@@ -1,3 +1,4 @@
+-- USING TA'S TABLES
 CREATE SCHEMA PEYSAZ ;
 CREATE TABLE PEYSAZ.PRODUCT (
 ID            CHAR(9)       NOT NULL ,
@@ -144,26 +145,24 @@ Phone_number  VARCHAR(20)  NOT NULL ,
 First_name    VARCHAR(15)  NOT NULL ,
 Last_name     VARCHAR(15)  NOT NULL ,
 Wallet_balance INT         NOT NULL ,
-CTimestamp     DATETIME ,
--- Timestamp
+CTimestamp  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 Referral_code  CHAR(6) ,       
 PRIMARY KEY (ID),
 UNIQUE (Phone_number));
 CREATE TABLE PEYSAZ.SHOPPING_CART (
-CID            CHAR(10)     NOT NULL ,
-CNumber        INT          NOT NULL ,
--- Status
-PRIMARY KEY (CID , CNumber) ,
+CID      CHAR(10)    NOT NULL,
+CNumber  INT         NOT NULL,
+status   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
+PRIMARY KEY (CID, CNumber),
 UNIQUE (CNumber),
 FOREIGN KEY (CID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.LOCKED_SHOPPING_CART (
-LCID           CHAR(10)     NOT NULL ,
-Cart_number    INT          NOT NULL ,
-CNumber        INT          NOT NULL ,
-CTimestamp     DATE ,  -- DATE ??
--- Timestamp
-PRIMARY KEY (LCID , Cart_number ,CNumber) ,
-FOREIGN KEY (LCID ,Cart_number) REFERENCES SHOPPING_CART(CID ,CNumber));
+LCID        CHAR(10)  NOT NULL,
+Cart_number INT       NOT NULL,
+CNumber     INT       NOT NULL,
+CTimestamp  DATETIME DEFAULT CURRENT_TIMESTAMP,  -- R TIMESTAMP?
+PRIMARY KEY (LCID, Cart_number, CNumber),
+FOREIGN KEY (LCID, Cart_number) REFERENCES SHOPPING_CART(CID, CNumber));
 CREATE TABLE PEYSAZ.ADDED_TO (
 LCID            CHAR(10)      NOT NULL ,
 Cart_number     INT           NOT NULL ,
@@ -180,10 +179,9 @@ Subscription_expiration_time DATETIME  NOT NULL ,
 PRIMARY KEY (VID) ,
 FOREIGN KEY (VID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.TRANSACTIONS (
-Tracking_code  VARCHAR(20)   NOT NULL ,
--- Status
--- Timestamp
-TTimestamp     DATETIME ,
+Tracking_code      VARCHAR(20)   NOT NULL,
+transaction_status ENUM('successful', 'partially_successful', 'unsuccessful') DEFAULT 'unsuccessful',  -- R CHECK
+TTimestamp         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (Tracking_code));
 CREATE TABLE PEYSAZ.BANK_TRANSACTION (
 BTracking_code  VARCHAR(20)   NOT NULL ,
