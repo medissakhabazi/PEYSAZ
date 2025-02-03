@@ -2,49 +2,70 @@ USE PEYSAZ ;
 ALTER TABLE PEYSAZ.LOCKED_SHOPPING_CART -- TO AVOID DIRECT CHANGING LOCKED SHOPPINT CART.
 ADD CONSTRAINT chk_locked_cart 
 CHECK (CNumber IS NOT NULL);
-
+-- ==========================================================================================================
 DELIMITER //
-CREATE TRIGGER prevent_adding_to_locked_cart
+CREATE TRIGGER prevent_adding_to_blocked_cart
 BEFORE INSERT ON PEYSAZ.ADDED_TO
 FOR EACH ROW
 BEGIN
-    DECLARE is_locked INT;
+    DECLARE cart_status ENUM('active', 'blocked', 'locked');
 
-    -- IS IT BLOCKED OR NOT
-    SELECT COUNT(*) INTO is_locked 
-    FROM PEYSAZ.LOCKED_SHOPPING_CART 
-    WHERE LCID = NEW.LCID AND Cart_number = NEW.Cart_number AND CNumber = NEW.Locked_Number;
-    -- IF BLOCKED THEN STOP
-    IF is_locked > 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'سبد خرید مسدود شده است و امکان افزودن آیتم جدید وجود ندارد.';
+    -- CHECK THE STATUS
+    SELECT Cstatus INTO cart_status
+    FROM PEYSAZ.SHOPPING_CART
+    WHERE CID = NEW.LCID AND CNumber = NEW.Cart_number;
+
+    IF cart_status = 'blocked' AND cart_status = 'locked' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'سبد خرید مسدود شده است و امکان افزودن محصول به آن وجود ندارد.';
     END IF;
 END;
 //
 DELIMITER ;
-
+-- ==========================================================================================================
 DELIMITER //
-CREATE TRIGGER prevent_transaction_on_locked_cart
+
+CREATE TRIGGER prevent_checkout_blocked_cart
 BEFORE INSERT ON PEYSAZ.ISSUED_FOR
 FOR EACH ROW
 BEGIN
-    DECLARE is_locked INT;
+    DECLARE cart_status ENUM('active', 'blocked', 'locked');
+    SELECT Cstatus INTO cart_status
+    FROM PEYSAZ.SHOPPING_CART
+    WHERE CID = NEW.IID AND CNumber = NEW.ICart_number;
 
-    -- CHECK THE STATUS OF CART
-    SELECT COUNT(*) INTO is_locked 
-    FROM PEYSAZ.LOCKED_SHOPPING_CART 
-    WHERE LCID = NEW.IID AND Cart_number = NEW.ICart_number AND CNumber = NEW.ILocked_Number;
-
-    -- IF IT BLOCKED NO TRANSACTION ALLOW
-    IF is_locked > 0 THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'سبد خرید مسدود شده است و امکان ثبت تراکنش وجود ندارد.';
+    -- AVOID TRANSACTION
+    IF cart_status = 'blocked' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'این سبد خرید مسدود شده است و امکان نهایی کردن سفارش وجود ندارد.';
     END IF;
 END;
 //
 DELIMITER ;
+-- ==========================================================================================================
 
 DELIMITER //
+CREATE TRIGGER prevent_discount_on_blocked_cart
+BEFORE INSERT ON PEYSAZ.APPLIED_TO
+FOR EACH ROW
+BEGIN
+    DECLARE cart_status ENUM('active', 'blocked', 'locked');
+    -- STATUS
+    SELECT Cstatus INTO cart_status
+    FROM PEYSAZ.SHOPPING_CART
+    WHERE CID = NEW.LCID AND CNumber = NEW.Cart_number;
+
+    -- AVOID ADDING DISCOUNT CODE
+    IF cart_status = 'blocked' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'سبد خرید مسدود شده است و امکان اعمال تخفیف روی آن وجود ندارد.';
+    END IF;
+END;
+//
+DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
 CREATE TRIGGER update_stock_after_adding_to_cart
 AFTER INSERT ON PEYSAZ.ADDED_TO
 FOR EACH ROW
@@ -69,7 +90,7 @@ BEGIN
 END;
 //
 DELIMITER ;
-
+-- ==========================================================================================================
 DELIMITER //
 
 CREATE TRIGGER prevent_expired_discount
@@ -89,7 +110,7 @@ BEGIN
 END;
 //
 DELIMITER ;
-
+-- ==========================================================================================================
 DELIMITER //
 
 CREATE TRIGGER prevent_exceeding_discount_limit
@@ -117,30 +138,26 @@ BEGIN
 END;
 //
 DELIMITER ;
-
 -- ==========================================================================================================
--- check this part carefully:
+-- check this part carefully: OKEY BABE 
 
 DELIMITER //
-
 CREATE TRIGGER after_successful_transaction
-AFTER INSERT ON PEYSAZ.TRANSACTIONS
+AFTER INSERT ON PEYSAZ.TRANSACTIONS -- UPDATE
 FOR EACH ROW
 BEGIN
-    IF NEW.transaction_status = 'successful' THEN
-        -- ISSUED_FOR table
-        DECLARE cart_cid CHAR(10);
-        DECLARE cart_number INT;
-        DECLARE locked_number INT;
-
-        -- finding which cart is 
-        SELECT IID, ICart_number, ILocked_Number INTO cart_cid, cart_number, locked_number  -- do we need locked_number?
-        FROM PEYSAZ.ISSUED_FOR
-        WHERE ITracking_code = NEW.Tracking_code;
-
-        UPDATE PEYSAZ.SHOPPING_CART
-        SET status = 'active'
-        WHERE CID = cart_cid AND CNumber = cart_number;
+	DECLARE cart_cid CHAR(10);
+	DECLARE cart_number INT;
+    IF  NEW.transaction_status = 'successful' THEN
+    
+     --  finding which cart is 
+	SELECT IIC , ICart_number INTO cart_cid , cart_number
+	FROM PEYSAZ.ISSUED_FOR
+	WHERE ITracking_code = NEW.Tracking_code;
+    
+	UPDATE PEYSAZ.SHOPPING_CART
+	SET status = 'active'
+	WHERE CID = cart_cid AND CNumber = cart_number;
     END IF;
 END;
 

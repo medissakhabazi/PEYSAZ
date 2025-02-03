@@ -152,7 +152,7 @@ UNIQUE (Phone_number));
 CREATE TABLE PEYSAZ.SHOPPING_CART (
 CID      CHAR(10)    NOT NULL,
 CNumber  INT         NOT NULL,
-status   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
+Cstatus   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
 PRIMARY KEY (CID, CNumber),
 UNIQUE (CNumber),
 FOREIGN KEY (CID) REFERENCES COSTUMER(ID));
@@ -180,12 +180,12 @@ PRIMARY KEY (VID) ,
 FOREIGN KEY (VID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.TRANSACTIONS (
 Tracking_code      VARCHAR(20)   NOT NULL,
-transaction_status ENUM('successful', 'partially_successful', 'unsuccessful') DEFAULT 'unsuccessful',  -- R CHECK
+transaction_status ENUM ('successful', 'partially_successful', 'unsuccessful') DEFAULT 'unsuccessful',  -- R CHECK
 TTimestamp         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (Tracking_code));
 CREATE TABLE PEYSAZ.BANK_TRANSACTION (
 BTracking_code  VARCHAR(20)   NOT NULL ,
-Card_number     CHAR(12)   NOT NULL , -- INT constraint
+Card_number     CHAR(12)      NOT NULL , -- INT constraint
 PRIMARY KEY (BTracking_code) ,
 FOREIGN KEY (BTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.WALLET_TRANSACTION (
