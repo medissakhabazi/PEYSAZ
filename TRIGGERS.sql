@@ -117,11 +117,10 @@ CREATE TRIGGER prevent_exceeding_discount_limit
 BEFORE INSERT ON PEYSAZ.APPLIED_TO
 FOR EACH ROW
 BEGIN
-    DECLARE max_usage INT;
     DECLARE current_usage INT;
-
+    DECLARE max_use INT;
     -- MAX USE
-    SELECT DLimit INTO max_usage
+    SELECT Usage_count INTO max_use
     FROM PEYSAZ.DISCOUNT_CODE
     WHERE DCODE = NEW.ACODE;
 
@@ -131,7 +130,7 @@ BEGIN
     WHERE ACODE = NEW.ACODE;
 
     -- IS IT FINISHED OR NOT
-    IF current_usage >= max_usage THEN
+    IF current_usage >= max_use THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'این کد تخفیف به حداکثر تعداد دفعات استفاده خود رسیده است و دیگر قابل استفاده نیست.';
     END IF;
@@ -139,9 +138,8 @@ END;
 //
 DELIMITER ;
 -- ==========================================================================================================
--- check this part carefully: OKEY BABE 
-
 DELIMITER //
+
 CREATE TRIGGER after_successful_transaction
 AFTER INSERT ON PEYSAZ.TRANSACTIONS -- UPDATE
 FOR EACH ROW
@@ -158,6 +156,40 @@ BEGIN
 	UPDATE PEYSAZ.SHOPPING_CART
 	SET status = 'active'
 	WHERE CID = cart_cid AND CNumber = cart_number;
+    END IF;
+END;
+//
+DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE TRIGGER limit_shopping_cart_for_regular_and_vip_costumer
+BEFORE INSERT ON PEYSAZ.SHOPPING_CART
+FOR EACH ROW
+BEGIN
+    DECLARE user_type INT;
+    DECLARE cart_count INT;
+    
+    -- CHECK IF IS VIP OR NOT
+    SELECT COUNT(*) INTO user_type
+    FROM PEYSAZ.VIP_CLIENTS
+    WHERE VID = NEW.CID;
+    
+    -- COUNTING NUMBER OF CARTS FOR EACH ID
+    SELECT COUNT(*) INTO cart_count
+    FROM PEYSAZ.SHOPPING_CART
+    WHERE CID = NEW.CID;
+    
+    -- REGULARE CONSTRAINT
+    IF user_type = 0 AND cart_count >= 1 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'کاربران عادی فقط می‌توانند یک سبد خرید داشته باشند.';
+    END IF;
+    
+    -- VIP CONSTRAINT 
+    IF user_type > 0 AND cart_count >= 5 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'کاربران ویژه فقط می‌توانند پنج سبد خرید داشته باشند.';
     END IF;
 END;
 //
