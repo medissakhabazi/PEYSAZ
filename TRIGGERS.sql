@@ -160,6 +160,6 @@ BEGIN
 	WHERE CID = cart_cid AND CNumber = cart_number;
     END IF;
 END;
-
-DELIMITER //
+//
+DELIMITER ;
 
