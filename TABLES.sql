@@ -185,7 +185,7 @@ TTimestamp         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (Tracking_code));
 CREATE TABLE PEYSAZ.BANK_TRANSACTION (
 BTracking_code  VARCHAR(20)   NOT NULL ,
-Card_number     VARCHAR(12)   NOT NULL , -- INT constraint
+Card_number     CHAR(12)   NOT NULL , -- INT constraint
 PRIMARY KEY (BTracking_code) ,
 FOREIGN KEY (BTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.WALLET_TRANSACTION (
