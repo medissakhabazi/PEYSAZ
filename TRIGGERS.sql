@@ -118,3 +118,31 @@ END;
 //
 DELIMITER ;
 
+-- ==========================================================================================================
+-- check this part carefully:
+
+DELIMITER //
+
+CREATE TRIGGER after_successful_transaction
+AFTER INSERT ON PEYSAZ.TRANSACTIONS
+FOR EACH ROW
+BEGIN
+    IF NEW.transaction_status = 'successful' THEN
+        -- ISSUED_FOR table
+        DECLARE cart_cid CHAR(10);
+        DECLARE cart_number INT;
+        DECLARE locked_number INT;
+
+        -- finding which cart is 
+        SELECT IID, ICart_number, ILocked_Number INTO cart_cid, cart_number, locked_number  -- do we need locked_number?
+        FROM PEYSAZ.ISSUED_FOR
+        WHERE ITracking_code = NEW.Tracking_code;
+
+        UPDATE PEYSAZ.SHOPPING_CART
+        SET status = 'active'
+        WHERE CID = cart_cid AND CNumber = cart_number;
+    END IF;
+END;
+
+DELIMITER //
+
