@@ -194,4 +194,44 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE TRIGGER enforce_discount_limit 
+BEFORE INSERT ON PEYSAZ.APPLIED_TO
+FOR EACH ROW
+BEGIN
+    DECLARE discount_amount INT;
+    DECLARE discount_limit INT;
+    DECLARE total_price DECIMAL(10,2);
+    DECLARE discount_type ENUM('percentage', 'fixed');
+    DECLARE applied_discount DECIMAL(10,2);
+
+    -- FIND DISCOUNT AMOUNT AND THE LIMIT OF THEM
+    SELECT Amount, DLimit INTO discount_amount, discount_limit
+    FROM PEYSAZ.DISCOUNT_CODE 
+    WHERE DCODE = NEW.ACODE;
+
+    -- TOTAL PRICE OF THE CART
+    SELECT  SUM(Cart_price * Quantity) INTO total_price -- Quantity ?
+    FROM PEYSAZ.ADDED_TO
+    WHERE LCID = NEW.LCID AND Cart_number = NEW.Cart_number AND Locked_Number = NEW.Locked_Number;
+
+    -- DETECT TYPE OF DISCOUNT
+    IF discount_amount <= 100 THEN
+        SET discount_type = 'percentage';
+        SET applied_discount = (total_price * discount_amount / 100);
+    ELSE
+        SET discount_type = 'fixed';
+        SET applied_discount = discount_amount;
+    END IF;
+
+    -- CHECK THE LIMIT OF DISCOUNT
+    IF applied_discount > discount_limit THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Discount exceeds allowed limit';
+    END IF;
+END;
+//
+DELIMITER ;
 
