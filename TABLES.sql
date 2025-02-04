@@ -212,7 +212,7 @@ PRIMARY KEY (DTracking_code) ,
 FOREIGN KEY (DID) REFERENCES COSTUMER(ID) ,
 FOREIGN KEY (DTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.ISSUED_FOR (
-ITracking_code   VARCHAR(20)   NOT NULL ,
+ITracking_code   VARCHAR(20)   NOT NULL ,  -- char?
 IID              CHAR(10)      NOT NULL ,
 ICart_number     INT           NOT NULL ,
 ILocked_Number   INT           NOT NULL ,
@@ -220,14 +220,14 @@ PRIMARY KEY (ITracking_code) ,
 FOREIGN KEY (ITracking_code) REFERENCES TRANSACTIONS(Tracking_code) ,
 FOREIGN KEY (IID, ICart_number, ILocked_Number) REFERENCES LOCKED_SHOPPING_CART(LCID, Cart_number, CNumber));
 CREATE TABLE PEYSAZ.DISCOUNT_CODE (
-DCODE  VARCHAR(7)     NOT NULL ,
+DCODE         CHAR(7)     NOT NULL ,
 Amount        INT     NOT NULL , -- CHECK
 DLimit        INT     NOT NULL ,
 Usage_count   INT     NOT NULL ,
 Expiration_date       DATETIME ,
 PRIMARY KEY (DCODE));
 CREATE TABLE PEYSAZ.PRIVATE_CODE (
-DCODE  VARCHAR(7)     NOT NULL ,
+DCODE   CHAR(7)     NOT NULL ,
 DID     CHAR(10)      NOT NULL ,
 DTimestamp            DATETIME ,
 PRIMARY KEY (DCODE) ,

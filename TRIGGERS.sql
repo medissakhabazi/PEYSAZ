@@ -254,19 +254,15 @@ BEGIN
     IF referrer_id IS NOT NULL THEN
         WHILE referrer_id IS NOT NULL DO
             SET discount_amount = 50.00 / POW(2, discount_level - 1);
+             SET discount_limit = 1000000; 
             IF discount_amount < 1 THEN
                 SET discount_amount = 50000;
-                SET discount_limit = 1000000; -- should i write it here???
-            ELSE
-                SET discount_limit = 1000000; 
             END IF;
 
             SET discount_expiration = NOW() + INTERVAL 7 DAY;  -- no idea ??
 
             INSERT INTO PEYSAZ.DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
-            VALUES (discount_code, discount_amount, discount_limit, 0, discount_expiration); -- 0 is okay??
-            INSERT INTO PEYSAZ.PRIVATE_CODE (DCODE, DID, DTimestamp)
-            VALUES (discount_code, referrer_id, NOW());
+            VALUES (Referral_code, discount_amount, discount_limit, 0, discount_expiration); -- 0 is okay?? need to be check
 
             SELECT Referrer INTO current_referrer_id
             FROM PEYSAZ.REFERS
@@ -275,18 +271,27 @@ BEGIN
             SET discount_level = discount_level + 1;
         END WHILE;
 
-		-- new user
-        SET discount_amount = 50.00;
-        SET discount_limit = 1000000; 
-        SET discount_expiration = NOW() + INTERVAL 7 DAY;
-
-        INSERT INTO PEYSAZ.DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
-        VALUES (discount_code, discount_amount, discount_limit, 0, discount_expiration);
-        INSERT INTO PEYSAZ.PRIVATE_CODE (DCODE, DID, DTimestamp)
-        VALUES (discount_code, NEW.ID, NOW());
     END IF;
 END ;
 //
 DELIMITER ;
+
+-- ==============================================================
+
+DELIMITER //
+CREATE TRIGGER subscriber_to_VIP
+AFTER INSERT ON PEYSAZ.SUBSCRIBES
+FOR EACH ROW
+BEGIN
+	DECLARE expiration DATETIME;
+    SET expiration = NOW() + INTERVAL 1 MONTH;
+    INSERT INTO PEYSAZ.VIP_CLIENT (VID , Subscription_expiration_time)
+    VALUE(NEW.SID , expiration);
+    UPDATE PEYSAZ.VIP_CLIENT
+    SET Subscription_expiration_time = expiration;
+    
+    -- need event for return back
+
+END;
 
 
