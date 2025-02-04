@@ -57,4 +57,17 @@ END;
 //
 DELIMITER ;
 
+-- ===========================================================================
+DELIMITER //
+
+CREATE EVENT expire_vip_subscription
+ON SCHEDULE EVERY 1 DAY
+DO
+BEGIN
+    DELETE FROM PEYSAZ.VIP_CLIENTS
+    WHERE Subscription_expiration_time < NOW();
+END ;
+//
+DELIMITER ;
+
 

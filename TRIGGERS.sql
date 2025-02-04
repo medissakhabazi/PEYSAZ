@@ -320,6 +320,22 @@ BEGIN
 END ;
 //
 DELIMITER ;
--- one more left
+
+DELIMITER //
+
+CREATE TRIGGER decrease_digital_wallet_cart
+AFTER INSERT ON PEYSAZ.ISSUED_FOR
+FOR EACH ROW
+BEGIN
+    DECLARE price DECIMAL(10,2);
+    SELECT SUM (Quantity * Cart_price) INTO price
+    FROM PEYSAZ.ADDED_TO
+    WHERE Cart_number = NEW.ICart_number AND LCID = NEW.IID AND Locked_Number = NEW.ILocked_Number;
+    UPDATE PEYSAZ.COSTUMER
+    SET Wallet_balance = Wallet_balance - price
+    WHERE ID = NEW.IID;
+END 
+// 
+DELIMITER ;
 
 
