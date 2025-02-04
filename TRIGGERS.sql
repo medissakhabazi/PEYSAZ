@@ -293,5 +293,33 @@ BEGIN
     -- need event for return back
 
 END;
+//
+DELIMITER;
+-- ================================================
+-- -----------------------------------------------
+DELIMITER //
+CREATE TRIGGER charge_digital_wallet
+AFTER INSERT ON  PEYSAZ.DEPOSITS_INTO_WALLET
+FOR EACH ROW
+BEGIN
+	UPDATE PEYSAZ.COSTUMER
+    SET Wallet_balance = NEW.Amount
+    WHERE ID = NEW.DID;
+END;
+
+DELIMITER //
+CREATE TRIGGER decrease_digital_wallet_subscribe
+AFTER INSERT ON PEYSAZ.SUBSCRIBES
+FOR EACH ROW
+BEGIN
+    DECLARE sub_price DECIMAL(10,2);
+    SET sub_price = 9999.99; -- price??
+    UPDATE PEYSAZ.COSTUMER
+    SET Wallet_balance = Wallet_balance - sub_price
+    WHERE ID = NEW.SID;
+END ;
+//
+DELIMITER ;
+-- one more left
 
 
