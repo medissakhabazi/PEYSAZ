@@ -234,4 +234,59 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE TRIGGER discount_code_difference
+AFTER INSERT ON PEYSAZ.COSTUMER
+FOR EACH ROW
+BEGIN
+    DECLARE referrer_id CHAR(10);
+    DECLARE discount_amount DECIMAL(5,2);
+    DECLARE discount_level INT DEFAULT 1;
+    DECLARE discount_code VARCHAR(7);
+    DECLARE discount_limit DECIMAL(10,2);
+    DECLARE discount_expiration DATETIME;
+    DECLARE current_referrer_id CHAR(10);
+
+
+    SET referrer_id = NEW.Referral_code;
+    IF referrer_id IS NOT NULL THEN
+        WHILE referrer_id IS NOT NULL DO
+            SET discount_amount = 50.00 / POW(2, discount_level - 1);
+            IF discount_amount < 1 THEN
+                SET discount_amount = 50000;
+                SET discount_limit = 1000000; -- should i write it here???
+            ELSE
+                SET discount_limit = 1000000; 
+            END IF;
+
+            SET discount_expiration = NOW() + INTERVAL 7 DAY;  -- no idea ??
+
+            INSERT INTO PEYSAZ.DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
+            VALUES (discount_code, discount_amount, discount_limit, 0, discount_expiration); -- 0 is okay??
+            INSERT INTO PEYSAZ.PRIVATE_CODE (DCODE, DID, DTimestamp)
+            VALUES (discount_code, referrer_id, NOW());
+
+            SELECT Referrer INTO current_referrer_id
+            FROM PEYSAZ.REFERS
+            WHERE Referee = referrer_id;
+            SET referrer_id = current_referrer_id;
+            SET discount_level = discount_level + 1;
+        END WHILE;
+
+		-- new user
+        SET discount_amount = 50.00;
+        SET discount_limit = 1000000; 
+        SET discount_expiration = NOW() + INTERVAL 7 DAY;
+
+        INSERT INTO PEYSAZ.DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
+        VALUES (discount_code, discount_amount, discount_limit, 0, discount_expiration);
+        INSERT INTO PEYSAZ.PRIVATE_CODE (DCODE, DID, DTimestamp)
+        VALUES (discount_code, NEW.ID, NOW());
+    END IF;
+END ;
+//
+DELIMITER ;
+
 
