@@ -48,7 +48,6 @@ BEGIN
         FROM PEYSAZ.LOCKED_SHOPPING_CART
         WHERE CTimestamp < NOW() - INTERVAL 7 DAY
     );
-
     -- UPDATE THE FREE TIME FOR LOCKED_SHOPPING_CART
     UPDATE PEYSAZ.LOCKED_SHOPPING_CART
     SET CTimestamp = NOW()
@@ -56,18 +55,16 @@ BEGIN
 END;
 //
 DELIMITER ;
-
 -- ===========================================================================
 DELIMITER //
 
 CREATE EVENT expire_vip_subscription
-ON SCHEDULE EVERY 1 DAY
+ON SCHEDULE EVERY 1 MINUTE
 DO
 BEGIN
+    -- CHECK IF EXPIRE 
     DELETE FROM PEYSAZ.VIP_CLIENTS
-    WHERE Subscription_expiration_time < NOW();
+    WHERE NEW.Subscription_expiration_time <= CURRENT_TIMESTAMP;
 END ;
 //
 DELIMITER ;
-
-

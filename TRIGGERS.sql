@@ -275,10 +275,9 @@ BEGIN
 END ;
 //
 DELIMITER ;
-
--- ==============================================================
-
+-- ==========================================================================================================
 DELIMITER //
+
 CREATE TRIGGER subscriber_to_VIP
 AFTER INSERT ON PEYSAZ.SUBSCRIBES
 FOR EACH ROW
@@ -306,7 +305,9 @@ BEGIN
     SET Wallet_balance = NEW.Amount
     WHERE ID = NEW.DID;
 END;
-
+//
+DELIMITER ;
+-- ==========================================================================================================
 DELIMITER //
 CREATE TRIGGER decrease_digital_wallet_subscribe
 AFTER INSERT ON PEYSAZ.SUBSCRIBES
@@ -317,12 +318,11 @@ BEGIN
     UPDATE PEYSAZ.COSTUMER
     SET Wallet_balance = Wallet_balance - sub_price
     WHERE ID = NEW.SID;
-END ;
+END;
 //
 DELIMITER ;
-
+-- ==========================================================================================================
 DELIMITER //
-
 CREATE TRIGGER decrease_digital_wallet_cart
 AFTER INSERT ON PEYSAZ.ISSUED_FOR
 FOR EACH ROW
@@ -334,8 +334,88 @@ BEGIN
     UPDATE PEYSAZ.COSTUMER
     SET Wallet_balance = Wallet_balance - price
     WHERE ID = NEW.IID;
-END 
+END; 
 // 
 DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
 
+CREATE TRIGGER Return_To_Wallet_After_Transaction
+AFTER INSERT ON TRANSACTIONS
+FOR EACH ROW
+BEGIN
+	DECLARE customer_id CHAR(10);
+	DECLARE transaction_amount DECIMAL(10, 2);
+	DECLARE is_vip INT;
+    -- CHECK THE TRANSACTION
+    IF NEW.transaction_status = 'successful' THEN
+
+        -- FIND COSTUMER IN ISSUED_FOR
+        SELECT IID INTO customer_id
+        FROM  ISSUED_FOR
+        WHERE ITracking_code = NEW.Tracking_code
+        LIMIT 1;
+
+        -- CHECK IS VIP OR NOT 
+        SELECT COUNT(*) INTO is_vip
+        FROM  VIP_CLIENTS
+        WHERE VID = customer_id;
+
+        -- IF VIP ADD 15% IN WALLET
+        IF is_vip > 0 THEN
+            -- TOTAL PRICE
+            SELECT SUM(Quantity * Cart_price)
+            INTO  transaction_amount
+            FROM  ADDED_TO
+            WHERE LCID = customer_id;
+            UPDATE COSTUMER
+            SET Wallet_balance = Wallet_balance + (transaction_amount * 0.15)
+            WHERE ID = customer_id;
+        END IF;
+    END IF;
+END;
+//
+DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+-- BLOCKING EXTRA CARTS 
+CREATE TRIGGER Block_Additional_Carts_On_VIP_Expiration
+AFTER UPDATE ON VIP_CLIENTS
+FOR EACH ROW
+BEGIN
+    -- CHECK IF EXPIRE 
+    IF NEW.Subscription_expiration_time <= CURRENT_TIMESTAMP THEN
+        -- BLOCK ALL CARTS EXEPT NUMBER 1
+        UPDATE SHOPPING_CART
+        SET status = 'blocked'
+        WHERE CID = NEW.VID
+          AND CNumber != 1
+          AND status != 'locked'; 
+    END IF;
+END;
+//
+DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE TRIGGER Block_Locked_Cart_After_Purchase
+AFTER UPDATE ON LOCKED_SHOPPING_CART
+FOR EACH ROW
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM ADDED_TO
+        WHERE LCID = NEW.LCID
+          AND Cart_number = NEW.Cart_number
+          AND Locked_Number = NEW.CNumber
+    ) THEN
+        UPDATE SHOPPING_CART
+        SET status = 'blocked'
+        WHERE CID = NEW.LCID
+          AND CNumber = NEW.Cart_number;
+    END IF;
+END;
+//
+DELIMITER ;
 
