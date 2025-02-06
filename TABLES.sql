@@ -140,7 +140,7 @@ PRIMARY KEY (GPU_ID , Motherboard_ID) ,
 FOREIGN KEY (GPU_ID) REFERENCES GPU(PID) ,
 FOREIGN KEY (Motherboard_ID) REFERENCES MOTHERBOARD(PID));
 CREATE TABLE PEYSAZ.COSTUMER (
-ID             CHAR(10)     NOT NULL ,
+ID            CHAR(10)     NOT NULL ,
 Phone_number   VARCHAR(20)  NOT NULL ,
 First_name     VARCHAR(15)  NOT NULL ,
 Last_name      VARCHAR(15)  NOT NULL ,
@@ -150,8 +150,8 @@ Referral_code  CHAR(6) ,
 PRIMARY KEY (ID),
 UNIQUE (Phone_number));
 CREATE TABLE PEYSAZ.SHOPPING_CART (
-CID      CHAR(10)    NOT NULL,
-CNumber  INT         NOT NULL,
+CID       CHAR(10)    NOT NULL,
+CNumber   INT         NOT NULL,
 Cstatus   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
 PRIMARY KEY (CID, CNumber),
 UNIQUE (CNumber),
