@@ -8,3 +8,14 @@ WHERE Stock_count > 0;
 END;
 //
 DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE VIEW unblocked_view_carts AS
+SELECT CID,CNumber
+FROM  PEYSAZ.SHOPPING_CART
+WHERE Cstatus !='blocked';
+
+END;
+//
+DELIMITER ;
