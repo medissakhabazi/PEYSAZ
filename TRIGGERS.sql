@@ -294,9 +294,9 @@ BEGIN
 END;
 //
 DELIMITER;
--- ================================================
--- -----------------------------------------------
+-- ==========================================================================================================
 DELIMITER //
+
 CREATE TRIGGER charge_digital_wallet
 AFTER INSERT ON  PEYSAZ.DEPOSITS_INTO_WALLET
 FOR EACH ROW
@@ -339,46 +339,6 @@ END;
 DELIMITER ;
 -- ==========================================================================================================
 DELIMITER //
-
-CREATE TRIGGER Return_To_Wallet_After_Transaction
-AFTER INSERT ON TRANSACTIONS
-FOR EACH ROW
-BEGIN
-	DECLARE customer_id CHAR(10);
-	DECLARE transaction_amount DECIMAL(10, 2);
-	DECLARE is_vip INT;
-    -- CHECK THE TRANSACTION
-    IF NEW.transaction_status = 'successful' THEN
-
-        -- FIND COSTUMER IN ISSUED_FOR
-        SELECT IID INTO customer_id
-        FROM  ISSUED_FOR
-        WHERE ITracking_code = NEW.Tracking_code
-        LIMIT 1;
-
-        -- CHECK IS VIP OR NOT 
-        SELECT COUNT(*) INTO is_vip
-        FROM  VIP_CLIENTS
-        WHERE VID = customer_id;
-
-        -- IF VIP ADD 15% IN WALLET
-        IF is_vip > 0 THEN
-            -- TOTAL PRICE
-            SELECT SUM(Quantity * Cart_price)
-            INTO  transaction_amount
-            FROM  ADDED_TO
-            WHERE LCID = customer_id;
-            UPDATE COSTUMER
-            SET Wallet_balance = Wallet_balance + (transaction_amount * 0.15)
-            WHERE ID = customer_id;
-        END IF;
-    END IF;
-END;
-//
-DELIMITER ;
--- ==========================================================================================================
-DELIMITER //
-
 -- BLOCKING EXTRA CARTS 
 CREATE TRIGGER Block_Additional_Carts_On_VIP_Expiration
 AFTER UPDATE ON VIP_CLIENTS
@@ -386,6 +346,7 @@ FOR EACH ROW
 BEGIN
     -- CHECK IF EXPIRE 
     IF NEW.Subscription_expiration_time <= CURRENT_TIMESTAMP THEN
+    
         -- BLOCK ALL CARTS EXEPT NUMBER 1
         UPDATE SHOPPING_CART
         SET status = 'blocked'
@@ -418,4 +379,38 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
 
+CREATE TRIGGER Handle_Partial_Transaction
+AFTER INSERT ON TRANSACTIONS
+FOR EACH ROW
+BEGIN
+    DECLARE customer_id CHAR(10);
+    DECLARE refund_amount DECIMAL(10,2);
+
+    IF NEW.transaction_status = 'partially_successful' THEN
+        -- CHECK IF IT BANK OR WALLET TRANSACTION
+        IF EXISTS (SELECT 1 FROM BANK_TRANSACTION WHERE BTracking_code = NEW.Tracking_code) 
+           OR EXISTS (SELECT 1 FROM WALLET_TRANSACTION WHERE WTracking_code = NEW.Tracking_code) THEN
+           
+            -- FIND USER WITH THIS TRANSACTIONS
+            SELECT I.IID INTO customer_id
+            FROM ISSUED_FOR AS I
+            WHERE I.ITracking_code = NEW.Tracking_code
+            LIMIT 1;
+
+            -- FIND COST PRICE
+            SELECT A.Cart_price INTO refund_amount
+            FROM ADDED_TO AS A
+            WHERE A.LCID = customer_id;
+
+            -- RETURN TO DIGITAL WALLET
+            UPDATE COSTUMER
+            SET Wallet_balance = Wallet_balance + refund_amount
+            WHERE ID = customer_id;
+        END IF;
+    END IF;
+END;
+//
+DELIMITER ;

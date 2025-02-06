@@ -55,7 +55,7 @@ BEGIN
 END;
 //
 DELIMITER ;
--- ===========================================================================
+-- ==========================================================================================================
 DELIMITER //
 
 CREATE EVENT expire_vip_subscription
@@ -66,5 +66,57 @@ BEGIN
     DELETE FROM PEYSAZ.VIP_CLIENTS
     WHERE NEW.Subscription_expiration_time <= CURRENT_TIMESTAMP;
 END ;
+//
+DELIMITER ;
+-- ==========================================================================================================
+DELIMITER //
+
+CREATE EVENT Monthly_VIP_Wallet_Return
+ON SCHEDULE EVERY 1 MONTH
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+    DECLARE vid CHAR(10);
+    DECLARE total_spent DECIMAL(10,2);
+    DECLARE done INT DEFAULT 0;
+    DECLARE cur CURSOR FOR 
+        SELECT VID 
+        FROM VIP_CLIENTS 
+        WHERE Subscription_expiration_time >= CURRENT_TIMESTAMP;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO vid;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- CALCULATE COST IN A MONTH
+        SELECT SUM(A.Cart_price* 0.15) 
+        INTO total_spent
+        FROM ISSUED_FOR AS I
+        JOIN LOCKED_SHOPPING_CART AS L
+            ON I.IID = L.LCID AND I.ICart_number = L.Cart_number
+        JOIN ADDED_TO AS A
+            ON L.LCID = A.LCID AND L.Cart_number = A.Cart_number AND L.CNumber = A.Locked_Number
+        WHERE I.IID = vid
+          AND I.ITracking_code IN (
+              SELECT Tracking_code 
+              FROM TRANSACTIONS
+              WHERE transaction_status = 'successful'
+                AND TTimestamp >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)
+          );
+
+        -- ADD 15% OF EACH CART PRICE IN ONE MONTH
+        IF total_spent IS NOT NULL THEN
+            UPDATE COSTUMER
+            SET Wallet_balance = Wallet_balance + total_spent
+            WHERE ID = vid;
+        END IF;
+    END LOOP;
+    CLOSE cur;
+END;
 //
 DELIMITER ;
