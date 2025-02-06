@@ -32,24 +32,33 @@ CREATE PROCEDURE Generate_Referral_Discount(IN ReferrerID CHAR(10), IN Level INT
 BEGIN
     DECLARE DiscountAmount DECIMAL(10, 2);
     DECLARE DiscountCode   CHAR(7);
-    DECLARE TotalDiscount  DECIMAL(10, 2); -- ؟؟؟؟ WTF
-
-    SET DiscountAmount = 50 / POW(2, Level - 1);
-    IF DiscountAmount < 1 THEN
-        SET DiscountAmount = 50000;
-    END IF;
-
-    CALL GenerateUniqueCode(7, DiscountCode);
+    DECLARE TotalDiscount  DECIMAL(10, 2); -- ؟؟؟؟ WTF ??? 
+    DECLARE Discount_type  ENUM('percentage', 'fixed');
     
-    IF TotalDiscount + DiscountAmount <= 1000000 THEN
-        -- Insert the discount code into the DISCOUNT_CODE 
-        INSERT INTO DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
-        VALUES (DiscountCode, DiscountAmount, 1, 0, DATE_ADD(CURRENT_DATE, INTERVAL 1 MONTH));
+    CALL DetermineDiscountType(DiscountAmount, Discount_type);
+    IF Discount_type = 'fixed' THEN
+        IF DiscountAmount > 1000000 THEN
+			SET DiscountAmount = 1000000;
+		END IF;
+    ELSE
+		IF Discount_type = 'percentage' THEN
+			SET DiscountAmount = DiscountAmount / POW(2, Level - 1); -- به جای ۵۰ میداریم هرچی که بود
+			IF DiscountAmount < 1 THEN
+				SET DiscountAmount = 50000;
+                SET Discount_type = 'fixed';
+			END IF;
+		END IF;
+	END IF;
+		
+        CALL GenerateUniqueCode(7, DiscountCode);
+    
+		-- Insert the discount code into the DISCOUNT_CODE 
+			INSERT INTO DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
+			VALUES (DiscountCode, DiscountAmount, 1, 0, DATE_ADD(CURRENT_DATE, INTERVAL 1 WEEK));
 
         -- Assign the discount code to the referrer
-        INSERT INTO PRIVATE_CODE (DCODE, DID, DTimestamp)
-        VALUES (DiscountCode, ReferrerID, CURRENT_TIMESTAMP);
-    END IF;
+			INSERT INTO PRIVATE_CODE (DCODE, DID, DTimestamp)
+			VALUES (DiscountCode, ReferrerID, CURRENT_TIMESTAMP);
 
     -- Recursive generate discount codes for the next level 
     IF EXISTS (SELECT 1 FROM REFERS WHERE Referee = ReferrerID) THEN
@@ -59,3 +68,20 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- ====================================================================================
+-- ====================================================================================
+DELIMITER //
+
+CREATE PROCEDURE DetermineDiscountType(IN discount_amount INT, OUT discount_type ENUM('percentage', 'fixed'))
+BEGIN
+    IF discount_amount <= 100 THEN
+        SET discount_type = 'percentage';
+    ELSE
+        SET discount_type = 'fixed';
+    END IF;
+END //
+
+DELIMITER ;
+-- ====================================================================================
+-- ====================================================================================
