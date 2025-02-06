@@ -179,22 +179,22 @@ Subscription_expiration_time DATETIME  NOT NULL ,
 PRIMARY KEY (VID) ,
 FOREIGN KEY (VID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.TRANSACTIONS (
-Tracking_code      VARCHAR(20)   NOT NULL,
+Tracking_code      CHAR(10)   NOT NULL,
 transaction_status ENUM ('successful', 'partially_successful', 'unsuccessful') DEFAULT 'unsuccessful',  -- R CHECK
 TTimestamp         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (Tracking_code));
 CREATE TABLE PEYSAZ.BANK_TRANSACTION (
-BTracking_code  VARCHAR(20)   NOT NULL ,
+BTracking_code  CHAR(10)      NOT NULL ,
 Card_number     CHAR(12)      NOT NULL , -- INT constraint
 PRIMARY KEY (BTracking_code) ,
 FOREIGN KEY (BTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.WALLET_TRANSACTION (
-WTracking_code  VARCHAR(20)   NOT NULL ,
+WTracking_code  CHAR(10)   NOT NULL ,
 PRIMARY KEY (WTracking_code) ,
 FOREIGN KEY (WTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.SUBSCRIBES (
 SID             CHAR(10)      NOT NULL ,
-STracking_code  VARCHAR(20)   NOT NULL ,
+STracking_code  CHAR(10)      NOT NULL ,
 PRIMARY KEY (STracking_code) ,
 FOREIGN KEY (SID) REFERENCES COSTUMER(ID) ,
 FOREIGN KEY (STracking_code) REFERENCES TRANSACTIONS(Tracking_code));
@@ -206,13 +206,13 @@ PRIMARY KEY (AID , Province , Remainder) ,
 FOREIGN KEY (AID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.DEPOSITS_INTO_WALLET (
 DID              CHAR(10)      NOT NULL ,
-DTracking_code  VARCHAR(20)   NOT NULL ,
+DTracking_code   CHAR(10)      NOT NULL ,
 Amount           DECIMAL(10,2) ,
 PRIMARY KEY (DTracking_code) ,
 FOREIGN KEY (DID) REFERENCES COSTUMER(ID) ,
 FOREIGN KEY (DTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.ISSUED_FOR (
-ITracking_code   VARCHAR(20)   NOT NULL ,  -- char?
+ITracking_code   CHAR(10)      NOT NULL ,  -- char?
 IID              CHAR(10)      NOT NULL ,
 ICart_number     INT           NOT NULL ,
 ILocked_Number   INT           NOT NULL ,
@@ -227,7 +227,7 @@ Usage_count   INT     NOT NULL ,
 Expiration_date       DATETIME ,
 PRIMARY KEY (DCODE));
 CREATE TABLE PEYSAZ.PRIVATE_CODE (
-DCODE   CHAR(7)     NOT NULL ,
+DCODE   CHAR(7)       NOT NULL ,
 DID     CHAR(10)      NOT NULL ,
 DTimestamp            DATETIME ,
 PRIMARY KEY (DCODE) ,
@@ -243,7 +243,7 @@ CREATE TABLE PEYSAZ.APPLIED_TO (
 LCID            CHAR(10)      NOT NULL ,
 Cart_number     INT           NOT NULL ,
 Locked_Number   INT           NOT NULL ,
-ACODE          VARCHAR(7)     NOT NULL ,
+ACODE          CHAR(7)        NOT NULL ,
 ATimestamp     DATETIME ,
 PRIMARY KEY (LCID, Cart_number, Locked_Number , ACODE) ,
 FOREIGN KEY (LCID, Cart_number, Locked_Number) REFERENCES LOCKED_SHOPPING_CART(LCID, Cart_number, CNumber) ,

@@ -1,9 +1,9 @@
 USE PEYSAZ ;
 DELIMITER //
-CREATE PROCEDURE Generate_Unique_Code(OUT new_code VARCHAR(7))
+CREATE PROCEDURE Generate_Unique_Code(OUT new_code CHAR(7))
 BEGIN
     DECLARE is_unique BOOLEAN DEFAULT FALSE;
-    DECLARE temp_code VARCHAR(7);
+    DECLARE temp_code CHAR(7);
     WHILE is_unique = FALSE DO
         -- GENERATE 7 CHAR DISCOUNT CODE
         SET temp_code = CONCAT(
@@ -31,8 +31,8 @@ DELIMITER //
 CREATE PROCEDURE Generate_Referral_Discount(IN ReferrerID CHAR(10), IN Level INT)
 BEGIN
     DECLARE DiscountAmount DECIMAL(10, 2);
-    DECLARE DiscountCode VARCHAR(7);
-    DECLARE TotalDiscount DECIMAL(10, 2); -- ؟؟؟؟ WTF
+    DECLARE DiscountCode   CHAR(7);
+    DECLARE TotalDiscount  DECIMAL(10, 2); -- ؟؟؟؟ WTF
 
     SET DiscountAmount = 50 / POW(2, Level - 1);
     IF DiscountAmount < 1 THEN
