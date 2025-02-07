@@ -5,7 +5,7 @@ CHECK (CNumber IS NOT NULL);
 
 ALTER TABLE PEYSAZ.COSTUMER
 ADD CONSTRAINT CHK_PhoneNumber_Format
-CHECK ( Phone_number REGEXP '^[0-9]{12}$');
+CHECK ( Phone_number REGEXP '^[0-9]+$');
 -- ==========================================================================================================
 DELIMITER //
 CREATE TRIGGER prevent_adding_to_blocked_cart

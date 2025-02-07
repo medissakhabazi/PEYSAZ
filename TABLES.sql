@@ -140,8 +140,8 @@ PRIMARY KEY (GPU_ID , Motherboard_ID) ,
 FOREIGN KEY (GPU_ID) REFERENCES GPU(PID) ,
 FOREIGN KEY (Motherboard_ID) REFERENCES MOTHERBOARD(PID));
 CREATE TABLE PEYSAZ.COSTUMER (
-ID            CHAR(10)     NOT NULL ,
-Phone_number   INT(12)  NOT NULL ,
+ID            CHAR(10)      NOT NULL ,
+Phone_number   VARCHAR(20)  NOT NULL ,
 First_name     VARCHAR(15)  NOT NULL ,
 Last_name      VARCHAR(15)  NOT NULL ,
 Wallet_balance DECIMAL(10,2)   NOT NULL ,
