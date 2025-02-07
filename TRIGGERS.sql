@@ -264,7 +264,7 @@ AFTER INSERT ON  PEYSAZ.DEPOSITS_INTO_WALLET
 FOR EACH ROW
 BEGIN
 	UPDATE PEYSAZ.COSTUMER
-    SET Wallet_balance = NEW.Amount
+    SET Wallet_balance = NEW.Amount + Wallet_balance
     WHERE ID = NEW.DID;
 END;
 //
