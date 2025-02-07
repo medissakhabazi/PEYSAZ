@@ -2,6 +2,10 @@ USE PEYSAZ ;
 ALTER TABLE PEYSAZ.LOCKED_SHOPPING_CART -- TO AVOID DIRECT CHANGING LOCKED SHOPPINT CART.
 ADD CONSTRAINT chk_locked_cart 
 CHECK (CNumber IS NOT NULL);
+
+ALTER TABLE PEYSAZ.COSTUMER
+ADD CONSTRAINT CHK_PhoneNumber_Format
+CHECK ( Phone_number REGEXP '^[0-9]{12}$');
 -- ==========================================================================================================
 DELIMITER //
 CREATE TRIGGER prevent_adding_to_blocked_cart
