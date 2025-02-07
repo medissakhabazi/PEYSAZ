@@ -217,7 +217,7 @@ BEGIN
     FROM PEYSAZ.ADDED_TO
     WHERE LCID = NEW.LCID AND Cart_number = NEW.Cart_number AND Locked_Number = NEW.Locked_Number;
 
-    CALL DetermineDiscountType(discount_amount, discount_type);
+    CALL Determine_Discount_Type(discount_amount, discount_type);
 
    -- DETECT TYPE OF DISCOUNT
     IF discount_type = 'percentage' THEN
