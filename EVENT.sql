@@ -64,7 +64,7 @@ DO
 BEGIN
     -- CHECK IF EXPIRE 
     DELETE FROM PEYSAZ.VIP_CLIENTS
-    WHERE NEW.Subscription_expiration_time <= CURRENT_TIMESTAMP;
+    WHERE  Subscription_expiration_time <= CURRENT_TIMESTAMP;
 END ;
 //
 DELIMITER ;
