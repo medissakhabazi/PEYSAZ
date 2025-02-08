@@ -263,9 +263,18 @@ CREATE TRIGGER charge_digital_wallet
 AFTER INSERT ON  PEYSAZ.DEPOSITS_INTO_WALLET
 FOR EACH ROW
 BEGIN
-	UPDATE PEYSAZ.COSTUMER
-    SET Wallet_balance = NEW.Amount + Wallet_balance
-    WHERE ID = NEW.DID;
+	
+	DECLARE Tstatus ENUM ('successful', 'partially_successful', 'unsuccessful');
+    
+    SELECT transaction_status INTO Tstatus
+    FROM PEYSAZ.TRANSACTIONS
+	WHERE NEW.DTracking_code = Tracking_code;
+	IF Tstatus = 'successful' THEN
+		UPDATE PEYSAZ.COSTUMER
+		SET Wallet_balance = NEW.Amount + Wallet_balance
+		WHERE ID = NEW.DID;
+	END IF;
+   
 END;
 //
 DELIMITER ;
