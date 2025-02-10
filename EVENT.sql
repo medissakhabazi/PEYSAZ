@@ -1,5 +1,5 @@
 USE PEYSAZ ;
-
+SET GLOBAL event_scheduler = ON ;
 DELIMITER //
 CREATE EVENT cancel_and_block_unpaid_carts
 ON SCHEDULE EVERY 1 DAY
@@ -109,7 +109,7 @@ BEGIN
               SELECT Tracking_code 
               FROM TRANSACTIONS
               WHERE transaction_status = 'successful'
-                AND TTimestamp >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)
+                AND TTimestamp >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) 
           );
 
         -- ADD 15% OF EACH CART PRICE IN ONE MONTH
