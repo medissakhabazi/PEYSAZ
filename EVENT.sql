@@ -126,7 +126,7 @@ BEGIN
         SET done = FALSE;
 
         UPDATE COSTUMER
-        SET Wallet_balance = Wallet_balance + total_spent
+        SET Wallet_balance = Wallet_balance + (total_spent* 0.15)
         WHERE ID = vid;
 
         SET total_spent = 0;
