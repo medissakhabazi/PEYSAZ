@@ -73,17 +73,17 @@ END
 DELIMITER ;
 
 -- =======================================================================================================================
-
 DELIMITER //
 
-CREATE PROCEDURE cart_price (IN user_id INTEGER, IN shopping_cart_number INTEGER, IN locked_cart_number INTEGER, OUT final BIGINT)
+CREATE PROCEDURE cart_price (IN user_id INTEGER, IN shopping_cart_number INTEGER, IN locked_cart_number INTEGER, OUT final DECIMAL(10,2))
 BEGIN
-    DECLARE total_price BIGINT;
-    DECLARE final_price BIGINT;
-    DECLARE discount_amount DECIMAL;
+    DECLARE total_price DECIMAL(10,2);
+    DECLARE final_price DECIMAL(10,2);
+    DECLARE discount_amount INT;
     DECLARE discount_limit INTEGER;
     DECLARE current_code INTEGER;
     DECLARE endloop TINYINT DEFAULT FALSE;
+    DECLARE discount_type ENUM('percentage', 'fixed');
 
     DECLARE code_list CURSOR FOR  
         SELECT ACODE 
@@ -98,7 +98,8 @@ BEGIN
     FROM ADDED_TO
     WHERE user_id = LCID AND locked_cart_number = Locked_Number AND shopping_cart_number = Cart_number;
 
-    SET final_price = total_cart_price;
+    -- CHANGED
+    SET final_price = total_price;
 
     OPEN code_list;
     process_discounts:
@@ -113,22 +114,26 @@ BEGIN
         FROM DISCOUNT_CODE AS discode
         WHERE current_code = discode.DCODE;
         
-		CALL Determine_Discount_Type(discount_amount, discount_type );
+    CALL Determine_Discount_Type(discount_amount, discount_type );
         
         IF discount_type = 'percentage' THEN
-			IF ((total_price * discount_amount / 100) > discount_limit) THEN
-            SIGNAL SQLSTATE '45000' 
-                SET MESSAGE_TEXT = 'مقدار کد تخفسف بیشتر از محدوده است.';
-			ELSE
-				SET final_price = total_price * discount_amount / 100;
-			END IF;
-		ELSE 
-			SET final_price = final_price - discount_amount;
-		END IF;
+      IF ((final_price * discount_amount / 100) > discount_limit) THEN
+                -- CHANGED
+                SET final_price = final_price - discount_limit;
+      ELSE
+        SET final_price = final_price - (final_price * discount_amount / 100);
+      END IF;
+    ELSE 
+      SET final_price = final_price - discount_amount;
+    END IF;
     END LOOP;
     CLOSE code_list;
     
-    SET final = final_price;
+    IF final_price < 0 THEN
+        SET final = 0;
+    ELSE
+        SET final = final_price;
+    END IF;
 END
 //
 DELIMITER ;
