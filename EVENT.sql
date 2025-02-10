@@ -80,44 +80,56 @@ STARTS CURRENT_TIMESTAMP
 DO
 BEGIN
     DECLARE vid CHAR(10);
-    DECLARE total_spent DECIMAL(10,2);
-    DECLARE done INT DEFAULT 0;
+    DECLARE cnumber     INT;
+    DECLARE clnumber   INT;
+    DECLARE total_spent DECIMAL(10,2) DEFAULT 0;
+    DECLARE spent_for_cart DECIMAL(10,2) DEFAULT 0;
+    DECLARE done BOOLEAN DEFAULT FALSE;
+
     DECLARE cur CURSOR FOR 
         SELECT VID 
         FROM VIP_CLIENTS 
         WHERE Subscription_expiration_time >= CURRENT_TIMESTAMP;
 
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    DECLARE cur2 CURSOR FOR
+        SELECT Cart_number, Locked_Number
+        FROM APPLIED_TO JOIN ISSUED_FOR ON LCID = IID AND ICart_number = Cart_number AND ILocked_Number = Locked_Number
+        WHERE LCID = vid AND ITracking_code IN (
+            SELECT Tracking_code 
+            FROM TRANSACTIONS
+            WHERE transaction_status = 'successful'
+            AND TTimestamp >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)
+          );
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     OPEN cur;
+
 
     read_loop: LOOP
         FETCH cur INTO vid;
         IF done THEN
             LEAVE read_loop;
         END IF;
+        OPEN cur2;
 
-        -- CALCULATE COST IN A MONTH
-        SELECT SUM(A.Cart_price* 0.15) 
-        INTO total_spent
-        FROM ISSUED_FOR AS I
-        JOIN LOCKED_SHOPPING_CART AS L
-            ON I.IID = L.LCID AND I.ICart_number = L.Cart_number
-        JOIN ADDED_TO AS A
-            ON L.LCID = A.LCID AND L.Cart_number = A.Cart_number AND L.CNumber = A.Locked_Number
-        WHERE I.IID = vid
-          AND I.ITracking_code IN (
-              SELECT Tracking_code 
-              FROM TRANSACTIONS
-              WHERE transaction_status = 'successful'
-                AND TTimestamp >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) 
-          );
+        numbers_loop: LOOP
+            FETCH cur2 INTO cnumber, clnumber;
+            IF done THEN
+                LEAVE numbers_loop;
+            END IF;
+            SET spent_for_cart = 0;
 
-        -- ADD 15% OF EACH CART PRICE IN ONE MONTH
-        IF total_spent IS NOT NULL THEN
-            UPDATE COSTUMER
-            SET Wallet_balance = Wallet_balance + total_spent
-            WHERE ID = vid;
-        END IF;
+            CALL cart_price(vid, cnumber, clnumber, spent_for_cart);
+            SET total_spent = total_spent + spent_for_cart;
+        END LOOP;
+        CLOSE cur2;
+        SET done = FALSE;
+
+        UPDATE COSTUMER
+        SET Wallet_balance = Wallet_balance + total_spent
+        WHERE ID = vid;
+
+        SET total_spent = 0;
     END LOOP;
     CLOSE cur;
 END;
