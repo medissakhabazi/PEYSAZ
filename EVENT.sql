@@ -46,7 +46,10 @@ BEGIN
     WHERE Cstatus = 'blocked' AND CNumber IN (
         SELECT Cart_number 
         FROM PEYSAZ.LOCKED_SHOPPING_CART
-        WHERE CTimestamp < NOW() - INTERVAL 7 DAY
+        WHERE CTimestamp < NOW() - INTERVAL 7 DAY AND LCID IN (
+        SELECT VID
+        FROM PEYSAZ.VIP_CLIENTS 
+        )
     );
     -- UPDATE THE FREE TIME FOR LOCKED_SHOPPING_CART
     UPDATE PEYSAZ.LOCKED_SHOPPING_CART

@@ -47,8 +47,8 @@ END;
 //
 DELIMITER ;
 -- ==========================================================================================================
-
 DELIMITER //
+
 CREATE TRIGGER prevent_discount_on_blocked_cart
 BEFORE INSERT ON PEYSAZ.APPLIED_TO
 FOR EACH ROW
@@ -126,7 +126,7 @@ BEGIN
     -- MAX USE
     SELECT Usage_count INTO max_use
     FROM PEYSAZ.DISCOUNT_CODE
-    WHERE DCODE = NEW.ACODE;
+    WHERE DCODE = NEW.ACODE AND LCID = NEW.LCID ;
 
     -- HOW MANY USED BEFORE
     SELECT COUNT(*) INTO current_usage
@@ -280,6 +280,7 @@ END;
 DELIMITER ;
 -- ==========================================================================================================
 DELIMITER //
+
 CREATE TRIGGER decrease_digital_wallet_subscribe
 AFTER INSERT ON PEYSAZ.SUBSCRIBES
 FOR EACH ROW
@@ -294,6 +295,7 @@ END;
 DELIMITER ;
 -- ==========================================================================================================
 DELIMITER //
+
 CREATE TRIGGER decrease_digital_wallet_cart
 AFTER INSERT ON PEYSAZ.ISSUED_FOR
 FOR EACH ROW
@@ -310,6 +312,7 @@ END;
 DELIMITER ;
 -- ==========================================================================================================
 DELIMITER //
+
 -- BLOCKING EXTRA CARTS 
 CREATE TRIGGER Block_Additional_Carts_On_VIP_Expiration
 AFTER UPDATE ON VIP_CLIENTS
