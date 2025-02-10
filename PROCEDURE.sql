@@ -71,3 +71,64 @@ BEGIN
 END 
 //
 DELIMITER ;
+
+-- =======================================================================================================================
+
+DELIMITER //
+
+CREATE PROCEDURE cart_price (IN user_id INTEGER, IN shopping_cart_number INTEGER, IN locked_cart_number INTEGER, OUT final BIGINT)
+BEGIN
+    DECLARE total_price BIGINT;
+    DECLARE final_price BIGINT;
+    DECLARE discount_amount DECIMAL;
+    DECLARE discount_limit INTEGER;
+    DECLARE current_code INTEGER;
+    DECLARE endloop TINYINT DEFAULT FALSE;
+
+    DECLARE code_list CURSOR FOR  
+        SELECT ACODE 
+        FROM APPLIED_TO AS apllied
+        WHERE user_id = apllied.LCID AND shopping_cart_number = apllied.Cart_number AND locked_cart_number = apllied.Locked_Number 
+        ORDER BY apt.ATimestamp;
+        
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET endloop = TRUE;
+ 
+    SELECT SUM(Cart_number * Quantity) 
+    INTO total_price 
+    FROM ADDED_TO
+    WHERE user_id = LCID AND locked_cart_number = Locked_Number AND shopping_cart_number = Cart_number;
+
+    SET final_price = total_cart_price;
+
+    OPEN code_list;
+    process_discounts:
+    LOOP
+        FETCH NEXT FROM code_list INTO current_code;
+        IF endloop THEN 
+            LEAVE process_discounts;
+        END IF;
+
+        SELECT discode.Amount, discode.DLimit
+        INTO discount_amount, discount_limit 
+        FROM DISCOUNT_CODE AS discode
+        WHERE current_code = discode.DCODE;
+        
+		CALL Determine_Discount_Type(discount_amount, discount_type );
+        
+        IF discount_type = 'percentage' THEN
+			IF ((total_price * discount_amount / 100) > discount_limit) THEN
+            SIGNAL SQLSTATE '45000' 
+                SET MESSAGE_TEXT = 'مقدار کد تخفسف بیشتر از محدوده است.';
+			ELSE
+				SET final_price = total_price * discount_amount / 100;
+			END IF;
+		ELSE 
+			SET final_price = final_price - discount_amount;
+		END IF;
+    END LOOP;
+    CLOSE code_list;
+    
+    SET final = final_price;
+END
+//
+DELIMITER ;
