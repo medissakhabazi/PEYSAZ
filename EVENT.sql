@@ -80,21 +80,16 @@ STARTS CURRENT_TIMESTAMP
 DO
 BEGIN
     DECLARE vid CHAR(10);
-    DECLARE cnumber     INT;
+    DECLARE cnumber    INT;
     DECLARE clnumber   INT;
     DECLARE total_spent DECIMAL(10,2) DEFAULT 0;
-    DECLARE spent_for_cart DECIMAL(10,2) DEFAULT 0;
     DECLARE done BOOLEAN DEFAULT FALSE;
 
     DECLARE cur CURSOR FOR 
-        SELECT VID 
-        FROM VIP_CLIENTS 
-        WHERE Subscription_expiration_time >= CURRENT_TIMESTAMP;
-
-    DECLARE cur2 CURSOR FOR
-        SELECT Cart_number, Locked_Number
-        FROM APPLIED_TO JOIN ISSUED_FOR ON LCID = IID AND ICart_number = Cart_number AND ILocked_Number = Locked_Number
-        WHERE LCID = vid AND ITracking_code IN (
+        SELECT VID, Cart_number, Locked_Number
+        FROM VIP_CLIENTS JOIN APPLIED_TO ON VID = LCID
+        JOIN ISSUED_FOR ON LCID = IID AND ICart_number = Cart_number AND ILocked_Number = Locked_Number
+        WHERE Subscription_expiration_time >= CURRENT_TIMESTAMP AND ITracking_code IN (
             SELECT Tracking_code 
             FROM TRANSACTIONS
             WHERE transaction_status = 'successful'
@@ -106,30 +101,17 @@ BEGIN
 
 
     read_loop: LOOP
-        FETCH cur INTO vid;
+        FETCH cur INTO vid, cnumber, clnumber;
         IF done THEN
             LEAVE read_loop;
         END IF;
-        OPEN cur2;
+        SET total_spent = 0;
 
-        numbers_loop: LOOP
-            FETCH cur2 INTO cnumber, clnumber;
-            IF done THEN
-                LEAVE numbers_loop;
-            END IF;
-            SET spent_for_cart = 0;
-
-            CALL cart_price(vid, cnumber, clnumber, spent_for_cart);
-            SET total_spent = total_spent + spent_for_cart;
-        END LOOP;
-        CLOSE cur2;
-        SET done = FALSE;
+        CALL Cart_price(vid, cnumber, clnumber, total_spent);
 
         UPDATE COSTUMER
-        SET Wallet_balance = Wallet_balance + (total_spent* 0.15)
+        SET Wallet_balance = Wallet_balance + (total_spent * 0.15)
         WHERE ID = vid;
-
-        SET total_spent = 0;
     END LOOP;
     CLOSE cur;
 END;
