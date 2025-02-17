@@ -32,7 +32,7 @@ BEGIN
     UPDATE PEYSAZ.LOCKED_SHOPPING_CART
     SET CTimestamp = NOW()
     WHERE CTimestamp < NOW() - INTERVAL 3 DAY;
-
+-- ==========================================================================================================
 END;
 //
 DELIMITER ;
