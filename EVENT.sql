@@ -6,15 +6,20 @@ ON SCHEDULE EVERY 1 DAY
 DO
 BEGIN
     UPDATE PEYSAZ.PRODUCT P
-    JOIN PEYSAZ.ADDED_TO A ON P.ID = A.Product_ID
-    JOIN PEYSAZ.LOCKED_SHOPPING_CART L ON A.LCID = L.LCID AND A.Cart_number = L.Cart_number AND A.Locked_Number = L.CNumber
-    LEFT JOIN PEYSAZ.ISSUED_FOR I ON L.LCID = I.IID AND L.Cart_number = I.ICart_number AND L.CNumber = I.ILocked_Number
-    LEFT JOIN PEYSAZ.TRANSACTIONS T ON I.ITracking_code = T.Tracking_code
-    -- REVEAL THE PRODUCTS 
-    SET P.Stock_count = P.Stock_count + A.Quantity
-    -- CHECK ALL THE CARTS AND IF IT IS NOT SUCCESSFULL LOCKED FOR MORE THAN 3 DAYS THEN 
-    WHERE L.CTimestamp < NOW() - INTERVAL 3 DAY
-    AND (T.transaction_status IS NULL OR T.transaction_status != 'successful');
+	JOIN PEYSAZ.ADDED_TO A ON P.ID = A.Product_ID
+	JOIN PEYSAZ.LOCKED_SHOPPING_CART L 
+    ON A.LCID = L.LCID 
+    AND A.Cart_number = L.Cart_number 
+    AND A.Locked_Number = L.CNumber
+	JOIN (  SELECT LCID, Cart_number, MAX(CTimestamp) AS Latest_CT
+			FROM PEYSAZ.LOCKED_SHOPPING_CART
+			GROUP BY LCID, Cart_number) AS LLatest 
+    ON  L.LCID = LLatest.LCID AND L.Cart_number = LLatest.Cart_number AND L.CTimestamp = LLatest.Latest_CT
+	LEFT JOIN PEYSAZ.ISSUED_FOR I ON L.LCID = I.IID AND L.Cart_number = I.ICart_number AND L.CNumber = I.ILocked_Number
+	LEFT JOIN PEYSAZ.TRANSACTIONS T ON I.ITracking_code = T.Tracking_code
+	SET P.Stock_count = P.Stock_count + A.Quantity
+	WHERE L.CTimestamp < NOW() - INTERVAL 3 DAY AND (T.transaction_status IS NULL OR T.transaction_status != 'successful');
+
 
     -- BLOCKED THE CARTS
     UPDATE PEYSAZ.SHOPPING_CART S
