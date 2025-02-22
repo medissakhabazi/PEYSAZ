@@ -148,7 +148,7 @@ CREATE TRIGGER after_successful_transaction
 AFTER INSERT ON PEYSAZ.TRANSACTIONS -- UPDATE
 FOR EACH ROW
 BEGIN
-	DECLARE cart_cid CHAR(10);
+	DECLARE cart_cid    INT;
 	DECLARE cart_number INT;
     IF  NEW.transaction_status = 'successful' THEN
     
@@ -171,7 +171,7 @@ CREATE TRIGGER limit_shopping_cart_for_regular_and_vip_costumer
 BEFORE INSERT ON PEYSAZ.SHOPPING_CART
 FOR EACH ROW
 BEGIN
-    DECLARE user_type INT;
+    DECLARE user_type  INT;
     DECLARE cart_count INT;
     
     -- CHECK IF IS VIP OR NOT
@@ -205,7 +205,7 @@ CREATE TRIGGER discount_code_difference
 AFTER INSERT ON PEYSAZ.COSTUMER
 FOR EACH ROW
 BEGIN
-	DECLARE TEMP_ID CHAR(10) ;
+	DECLARE TEMP_ID INT ;
     
 	IF Referral_code IS NOT NULL THEN
     SELECT Referee INTO TEMP_ID
@@ -320,7 +320,7 @@ CREATE TRIGGER Handle_Partial_Transaction
 AFTER INSERT ON TRANSACTIONS
 FOR EACH ROW
 BEGIN
-    DECLARE customer_id CHAR(10);
+    DECLARE customer_id   INT;
     DECLARE refund_amount DECIMAL(10,2);
 
     IF NEW.transaction_status = 'partially_successful' THEN
