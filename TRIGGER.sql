@@ -207,7 +207,7 @@ FOR EACH ROW
 BEGIN
 	DECLARE TEMP_ID INT ;
     
-	IF Referral_code IS NOT NULL THEN
+	IF NEW.Referral_code IS NOT NULL THEN   -- PROBLEM IN BACKEND, FIX IT WITH WRite NEW.Referral_code
     SELECT Referee INTO TEMP_ID
     FROM REFERS
     WHERE Referee = NEW.ID ;
