@@ -1,13 +1,28 @@
 use PEYSAZ;
-INSERT INTO PEYSAZ.COSTUMER (ID, Phone_number, First_name, Last_name, Wallet_balance, Referral_code) 
+INSERT INTO PEYSAZ.COSTUMER (Phone_number, First_name, Last_name, Wallet_balance, Referral_code)
+VALUES  
+('1234567890', 'Ali', 'Reza', 500.00, 'ABC123'),
+('9876543210', 'Sara', 'Mohammadi', 1200.50, NULL),
+('5678901234', 'Hassan', 'Karimi', 350.75, 'XYZ789'),
+('4567890123', 'Mina', 'Taheri', 800.00, 'LMN456'),
+('3456789012', 'Amir', 'Rahmani', 50.25, NULL),
+('2345678901', 'Fatemeh', 'Shahbazi', 620.90, 'PQR234'),
+('8765432109', 'Reza', 'Azimi', 999.99, NULL),
+('7654321098', 'Leila', 'Farsi', 1500.00, 'GHJ678'),
+('6543210987', 'Kian', 'Jafari', 75.30, NULL),
+('5432109876', 'Elham', 'Nasiri', 200.40, 'TUV345');
+
+
+
+INSERT INTO PEYSAZ.VIP_CLIENTS (VID, Subscription_expiration_time)
 VALUES 
-('CUST001', '+1234567890', 'John', 'Doe', 150.75, 'REF001'),
-('CUST002', '+9876543210', 'Jane', 'Smith', 200.50, 'REF002'),
-('CUST003', '+1122334455', 'Alice', 'Johnson', 75.00, 'REF003'),
-('CUST004', '+9988776655', 'Bob', 'Brown', 300.25, 'REF004'),
-('CUST005', '+5544332211', 'Charlie', 'Davis', 50.00, NULL),
-('CUST006', '+6677889900', 'Eva', 'Wilson', 125.90, 'REF005'),
-('CUST007', '+3344556677', 'Frank', 'Martinez', 400.00, NULL),
-('CUST008', '+7788990011', 'Grace', 'Lee', 250.60, 'REF006'),
-('CUST009', '+9900112233', 'Henry', 'Clark', 100.00, 'REF007'),
-('CUST010', '+4455667788', 'Irene', 'Lewis', 175.30, NULL);
+(1, '2025-12-31 23:59:59'),  -- Ali
+(2, '2024-06-15 12:00:00'),  -- Sara
+(4, '2026-01-01 00:00:00'),  -- Mina
+(6, '2025-08-20 18:30:00'),  -- Fatemeh
+(8, '2024-11-10 09:45:00'),  -- Leila
+(10, '2026-07-05 14:00:00'), -- Elham
+(3, '2025-05-22 17:15:00'),  -- Hassan
+(5, '2024-09-30 23:59:59'),  -- Amir
+(7, '2026-03-10 06:20:00'),  -- Reza
+(9, '2024-12-25 20:00:00');  -- Kian

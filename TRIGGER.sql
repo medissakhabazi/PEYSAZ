@@ -211,7 +211,7 @@ BEGIN
     SELECT Referee INTO TEMP_ID
     FROM REFERS
     WHERE Referee = NEW.ID ;
-    CALL generate_discount_code_chain(NEW.ID ,1);
+    -- CALL generate_discount_code_chain(NEW.ID ,1);
     END IF ;
 END;
 //
