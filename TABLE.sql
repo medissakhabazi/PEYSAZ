@@ -146,7 +146,7 @@ First_name     VARCHAR(15)  NOT NULL ,
 Last_name      VARCHAR(15)  NOT NULL ,
 Wallet_balance DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
 CTimestamp  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-Referral_code  CHAR(6) DEFAULT NULL,       
+Referral_code  CHAR(6) NOT NULL,     -- It can not be null!  
 PRIMARY KEY (ID),
 UNIQUE (Phone_number));
 CREATE TABLE PEYSAZ.SHOPPING_CART (
