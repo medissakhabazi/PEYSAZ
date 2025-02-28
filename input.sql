@@ -33,14 +33,14 @@ INSERT INTO ADDRESS (AID, Province, Remainder) VALUES
 (10, 'Province10', 'Address10');
  
 INSERT INTO TRANSACTIONS (Tracking_code, transaction_status, TTimestamp) VALUES
-(1001, 'unsuccessful', '2024-06-15'),
+(1001, 'unsuccessful', '2025-02-15'),
 (1002, 'successful', '2025-01-10'),
 (1003, 'partially_successful', '2025-02-15'),
 (1004, 'unsuccessful', '2024-05-30'),
 (1005, 'successful', '2025-01-20'),
 (1006, 'unsuccessful', '2024-04-30'),
 (1007, 'partially_successful', '2025-12-15'),
-(1008, 'successful', '2025-01-15'),
+(1008, 'successful', '2025-02-24'),
 (1009, 'unsuccessful', '2024-06-30'),
 (1010, 'successful', '2024-01-12');
 
@@ -85,8 +85,23 @@ INSERT INTO VIP_CLIENTS (VID, Subscription_expiration_time) VALUES
 -- Insert SHOPPING_CART data
 INSERT INTO SHOPPING_CART (CID, CNumber, Cstatus) VALUES
 (1, 1, 'active'),
-(2, 2, 'active'),
-(3, 3, 'active'),
+(1, 2, 'active'),
+(1, 3, 'blocked'),
+(1, 4, 'active'),
+(1, 5, 'locked'),
+
+(2, 1, 'blocked'),
+(2, 2, 'blocked'),
+(2, 3, 'active'),
+(2, 4, 'active'),
+(2, 5, 'locked'),
+
+(3, 1, 'blocked'),
+(3, 2, 'locked'),
+(3, 3, 'blocked'),
+(3, 4, 'active'),
+(3, 5, 'active'),
+
 (4, 4, 'active'),
 (5, 5, 'active');
 
@@ -127,31 +142,20 @@ INSERT INTO ISSUED_FOR (ITracking_code, IID, ICart_number, ILocked_number) VALUE
 (1004, 4, 4, 4),
 (1005, 5, 5, 5);
 
--- Insert PRODUCT data
-INSERT INTO PRODUCT (ID, Category, Image, Current_price, Stock_count, Brand, Model) VALUES
-(1,  'Electronics', NULL, 500,  10, 'BrandA', 'ModelX'),
-(2,  'Electronics', NULL, 300,  30, 'BrandB', 'ModelY'),
-(3,  'Electronics', NULL, 700,  15, 'BrandC', 'ModelZ'),
-(4,  'Electronics', NULL, 100,  10, 'BrandD', 'ModelW'),
-(5,  'Electronics', NULL,  50, 100, 'BrandE', 'ModelV'),
-(6,  'Electronics', NULL, 400, 100, 'BrandC', 'ModelA'),
-(7,  'Electronics', NULL, 350, 200, 'BrandD', 'ModelA'),
-(8,  'Electronics', NULL, 307, 224, 'BrandE', 'ModelY'),
-(9,  'Electronics', NULL, 312, 221, 'BrandA', 'ModelY'),
-(10, 'Electronics', NULL, 30 ,  20, 'BrandF', 'ModelZ'),
-(11, 'Electronics', NULL, 100, 190, 'BrandV', 'ModelY'),
-(12, 'Electronics', NULL, 300, 140, 'BrandV', 'ModelX'),
-(13, 'Electronics', NULL, 400, 130, 'BrandH', 'ModelM'),
-(14, 'Electronics', NULL, 600, 230, 'BrandN', 'ModelY'),
-(15, 'Electronics', NULL, 400,  53, 'BrandA', 'ModelQ'),
-(16, 'Electronics', NULL, 700, 219, 'BrandF', 'ModelG'),
-(17, 'Electronics', NULL, 400, 324, 'BrandS', 'ModelX'),
-(18, 'Electronics', NULL, 200, 223, 'BrandA', 'ModelW'),
-(19, 'Electronics', NULL, 340, 212, 'BrandA', 'ModelA'),
-(20, 'Electronics', NULL, 350, 212, 'BrandB', 'ModelY'),
-(21, 'Electronics', NULL, 313,  23, 'BrandS', 'ModelM'),
-(22, 'Electronics', NULL, 309, 243, 'BrandF', 'ModelA'),
-(23, 'Electronics', NULL, 408, 235, 'BrandF', 'ModelB');
+
+INSERT INTO PEYSAZ.PRODUCT (ID, Category,Image, Current_price, Stock_count, Brand, Model) VALUES
+(1,'GPU', null , 499.99, 10, 'NVIDIA', 'RTX 3070'),
+(2,'GPU', null , 699.99, 5, 'AMD', 'RX 6800'),
+(3,'CPU', null , 299.99, 15, 'Intel', 'i7-12700K'),
+(4,'CPU', null ,199.99, 20, 'AMD', 'Ryzen 5 5600X'),
+(5,'Motherboard', null , 149.99, 25, 'ASUS', 'B550-F'),
+(6,'Motherboard', null , 199.99, 10, 'MSI', 'Z690 PRO'),
+(7,'RAM', null , 79.99, 30, 'Corsair', 'Vengeance LPX 16GB'),
+(8,'RAM', null , 89.99, 25, 'G.Skill', 'Trident Z 16GB'),
+(9,'SSD', null ,99.99, 50, 'Samsung', '970 EVO 1TB'),
+(10,'Power Supply', null , 129.99, 15, 'Corsair', 'RM750'),
+(11,'Cooler', null , 59.99, 40, 'Noctua', 'NH-D15');
+
 
 -- Insert ADDED_TO data
 INSERT INTO ADDED_TO (LCID, Cart_number, Locked_number, Product_ID, Quantity, Cart_price) VALUES
@@ -166,53 +170,49 @@ INSERT INTO APPLIED_TO (LCID, Cart_number, Locked_number, ACODE, ATimestamp) VAL
 (1, 1, 1, 106, NOW()),
 (1, 1, 1, 105, NOW());
 
--- Insert HDD data
-INSERT INTO HDD (PID, Rotational_speed, Wattage, Capacity, Depth, Height, Width) VALUES
-(1, 7200, 10, 1000, 10, 10, 10),
-(2, 5400, 15, 2000, 12, 12, 12);
-
--- Insert GPU data
-INSERT INTO GPU (PID, Clock_speed, Ram_size, Number_of_fans, Wattage, Depth, Height, Width) VALUES
-(3, 1500, 8, 2, 200, 20, 20, 20),
-(4, 1400, 6, 1, 180, 18, 18, 18);
-
--- Insert POWER_SUPPLY data
-INSERT INTO POWER_SUPPLY (PID, Supported_Wattage, Depth, Height, Width) VALUES
-(5, 650, 15, 15, 15),
-(6, 750, 17, 17, 17);
-
--- Insert COOLER data
-INSERT INTO COOLER (PID, Maximum_rotational_speed, Wattage, Fan_size, Cooling_method, Depth, Height, Width) VALUES
-(7, 2500, 50, 120, 1, 5, 5, 5),
-(8, 2200, 45, 115, 1, 6, 6, 6);
-
--- Insert CPU data
-INSERT INTO PCPU (PID, Microarchitecture, Maximum_addressable_memory_limit, Boost_frequency, Base_frequency, Number_of_cores, Number_of_Threads, Generation, Wattage) VALUES
-(9, 'x86', 64, 4.5, 3.6, 8, 16, 10, 95),
-(10,'arm', 128, 5.0, 4.0, 10, 20, 11, 105);
-
--- Insert MOTHERBOARD dataMicroarchitecture
-INSERT INTO MOTHERBOARD (PID, Chipset, Number_of_memory_slot, Memory_speed_range, Wattage, Depth, Height, Width) VALUES
-(11, 'Z490', 4, 3200, 50, 30, 30, 30),
-(12, 'X570', 4,  3600, 60, 32, 32, 32),
-(13, 'B550', 2,  3200, 45, 28, 28, 28),
-(14, 'Z390', 4, 3000, 55, 31, 31, 31),
-(15, 'H370', 2, 2666, 40, 27, 27, 27);
-
--- Insert RAM_STICK data
-INSERT INTO RAM_STICK (PID, Frequency, Wattage, Capacity, Generation, Depth, Height, Width) VALUES
-(16, 3200, 15, 16, 'DDR4', 10, 10, 10),
-(17, 3600, 18, 32, 'DDR4', 11, 11, 11),
-(18, 3000, 12, 8, 'DDR3', 9, 9, 9),
-(19, 2666, 10, 4, 'DDR3', 8, 8, 8),
-(20, 2133, 8, 2, 'DDR2', 7, 7, 7);
-
--- Insert SSD data
-INSERT INTO SSD (PID, Wattage, Capacity) VALUES
-(21, 5, 500),
-(22, 7, 1000),
-(23, 6, 250);
 
 
+INSERT INTO PEYSAZ.COOLER (PID, Maximum_rotational_speed, Fan_size, Cooling_method, Wattage, Height, Width, Depth) VALUES
+(11, 1500, 140, 'Air', 8, 165, 150, 135);
+
+INSERT INTO PEYSAZ.POWER_SUPPLY (PID, Supported_wattage, Height, Width, Depth) VALUES
+(10, 750, 86, 150, 140);
+
+INSERT INTO PEYSAZ.SSD (PID, Wattage, Capacity) VALUES
+(9, 5, 1000);
+INSERT INTO PEYSAZ.RAM_STICK (PID, Frequency, Generation, Wattage, Capacity, Height, Width, Depth) VALUES
+(7, 3200, 'DDR4', 10, 16, 5, 133, 34),
+(8, 3600, 'DDR4', 12, 16, 5, 133, 34);
+
+INSERT INTO PEYSAZ.MOTHERBOARD (PID, Chipset, Memory_speed_range, Number_of_memory_slot, Wattage, Height, Width, Depth) VALUES
+(5, 'B550', 3200, 4, 75, 30, 244, 244),
+(6, 'Z690', 4800, 4, 85, 30, 244, 244);
+
+INSERT INTO PEYSAZ.PCPU (PID, Maximum_addressable_memory_limit, Boost_frequency, Base_frequency, Number_of_cores, Number_of_Threads, Microarchitecture, Generation, Wattage) VALUES
+(3, 128, 5000, 3600, 12, 24, 'Alder Lake', '12th Gen', 125),
+(4, 64, 4600, 3700, 6, 12, 'Zen 3', '5000 Series', 65);
+
+INSERT INTO PEYSAZ.GPU (PID, Clock_speed, Ram_size, Number_of_fans, Wattage, Height, Width, Depth) VALUES
+(1, 1800, 8, 2, 220, 50, 120, 250),
+(2, 1700, 16, 3, 250, 55, 125, 260);
 
 
+INSERT INTO PEYSAZ.CONNECTOR_COMPATIBLE_WITH (GPU_ID, Power_ID) VALUES
+(1, 10), -- RTX 3070 ↔️ RM750
+(2, 10); -- RX 6800 ↔️ RM750
+
+INSERT INTO PEYSAZ.SM_SLOT_COMPATIBLE_WITH (SSD_ID, Motherboard_ID) VALUES
+(9, 5),  -- 970 EVO ↔️ B550-F
+(9, 6);  -- 970 EVO ↔️ Z690 PRO
+
+INSERT INTO PEYSAZ.RM_SLOT_COMPATIBLE_WITH (RAM_ID, Motherboard_ID) VALUES
+(7, 5),  -- Vengeance LPX ↔️ B550-F
+(8, 6);  -- Trident Z ↔️ Z690 PRO
+
+INSERT INTO PEYSAZ.MC_SOCKET_COMPATIBLE_WITH (CPU_ID, Motherboard_ID) VALUES
+(3, 6),  -- i7-12700K ↔️ Z690 PRO
+(4, 5);  -- Ryzen 5 5600X ↔️ B550-F
+
+INSERT INTO PEYSAZ.CC_SOCKET_COMPATIBLE_WITH (CPU_ID, Cooler_ID) VALUES
+(3, 11),  -- i7-12700K ↔️ NH-D15
+(4, 11);  -- Ryzen 5 5600X ↔️ NH-D15

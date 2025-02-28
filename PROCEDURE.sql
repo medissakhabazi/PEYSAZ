@@ -83,12 +83,13 @@ BEGIN
     DECLARE discount_limit INTEGER;
     DECLARE current_code INTEGER;
     DECLARE endloop TINYINT DEFAULT FALSE;
+    DECLARE discount_type ENUM('percentage', 'fixed'); -- ?????????
 
     DECLARE code_list CURSOR FOR  
         SELECT ACODE 
         FROM APPLIED_TO AS apllied
         WHERE user_id = apllied.LCID AND shopping_cart_number = apllied.Cart_number AND locked_cart_number = apllied.Locked_Number 
-        ORDER BY apt.ATimestamp;
+        ORDER BY apllied.ATimestamp; -- why apt.ATimestamp???
         
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET endloop = TRUE;
  
@@ -97,7 +98,7 @@ BEGIN
     FROM ADDED_TO
     WHERE user_id = LCID AND locked_cart_number = Locked_Number AND shopping_cart_number = Cart_number;
 
-    SET final_price = total_cart_price;
+    SET final_price = total_price; -- why total_cart_price???
 
     OPEN code_list;
     process_discounts:

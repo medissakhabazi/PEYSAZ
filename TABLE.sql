@@ -154,7 +154,7 @@ CID       INT         NOT NULL,
 CNumber   INT         NOT NULL,
 Cstatus   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
 PRIMARY KEY (CID, CNumber),
-UNIQUE (CNumber),
+-- UNIQUE (CNumber),
 FOREIGN KEY (CID) REFERENCES COSTUMER(ID));
 CREATE TABLE PEYSAZ.LOCKED_SHOPPING_CART (
 LCID        INT       NOT NULL,
