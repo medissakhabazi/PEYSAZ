@@ -35,10 +35,10 @@ INSERT INTO ADDRESS (AID, Province, Remainder) VALUES
 INSERT INTO TRANSACTIONS (Tracking_code, transaction_status, TTimestamp) VALUES
 (1001, 'unsuccessful', '2025-02-15'),
 (1002, 'successful', '2025-01-10'),
-(1003, 'partially_successful', '2025-02-15'),
+(1003, 'successful', '2025-02-15'),
 (1004, 'unsuccessful', '2024-05-30'),
 (1005, 'successful', '2025-01-20'),
-(1006, 'unsuccessful', '2024-04-30'),
+(1006, 'partially_successful', '2025-03-01'),
 (1007, 'partially_successful', '2025-12-15'),
 (1008, 'successful', '2025-02-24'),
 (1009, 'unsuccessful', '2024-06-30'),
@@ -84,11 +84,11 @@ INSERT INTO VIP_CLIENTS (VID, Subscription_expiration_time) VALUES
 
 -- Insert SHOPPING_CART data
 INSERT INTO SHOPPING_CART (CID, CNumber, Cstatus) VALUES
-(1, 1, 'active'),
-(1, 2, 'active'),
+(1, 1, 'blocked'),
+(1, 2, 'blocked'),
 (1, 3, 'blocked'),
-(1, 4, 'active'),
-(1, 5, 'locked'),
+(1, 4, 'blocked'),
+(1, 5, 'blocked'),
 
 (2, 1, 'blocked'),
 (2, 2, 'blocked'),
