@@ -36,7 +36,7 @@ INSERT INTO TRANSACTIONS (Tracking_code, transaction_status, TTimestamp) VALUES
 (1001, 'unsuccessful', '2025-02-15'),
 (1002, 'successful', '2025-01-10'),
 (1003, 'successful', '2025-02-15'),
-(1004, 'unsuccessful', '2024-05-30'),
+(1004, 'successful', '2025-03-01'),
 (1005, 'successful', '2025-01-20'),
 (1006, 'partially_successful', '2025-03-01'),
 (1007, 'partially_successful', '2025-12-15'),
@@ -129,7 +129,7 @@ INSERT INTO LOCKED_SHOPPING_CART (LCID, Cart_number, CNumber, CTimestamp) VALUES
 (1, 1, 1, '2025-01-20 12:00:00'),
 (2, 2, 2, '2025-01-21 13:00:00'),
 (3, 3, 3, '2025-01-22 14:00:00'),
-(4, 4, 4, '2025-01-23 15:00:00'),
+(4, 4, 4, '2025-03-01 15:00:00'),
 (5, 5, 5, '2025-01-24 16:00:00');
 
 -- Insert ISSUED_FOR data

@@ -93,12 +93,13 @@ BEGIN
         
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET endloop = TRUE;
  
-    SELECT SUM(Cart_number * Quantity) 
+    SELECT SUM(cart_price * Quantity) 
     INTO total_price 
     FROM ADDED_TO
     WHERE user_id = LCID AND locked_cart_number = Locked_Number AND shopping_cart_number = Cart_number;
 
     SET final_price = total_price; -- why total_cart_price???
+    
 
     OPEN code_list;
     process_discounts:
@@ -117,13 +118,13 @@ BEGIN
         
         IF discount_type = 'percentage' THEN
 			IF ((total_price * discount_amount / 100) > discount_limit) THEN
-            SIGNAL SQLSTATE '45000' 
-                SET MESSAGE_TEXT = 'مقدار کد تخفسف بیشتر از محدوده است.';
+				SET final_price = final_price - discount_limit; 
 			ELSE
-				SET final_price = total_price * discount_amount / 100;
+				SET final_price = final_price - (final_price * discount_amount / 100);
 			END IF;
 		ELSE 
 			SET final_price = final_price - discount_amount;
+
 		END IF;
     END LOOP;
     CLOSE code_list;
