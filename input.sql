@@ -84,7 +84,7 @@ INSERT INTO VIP_CLIENTS (VID, Subscription_expiration_time) VALUES
 
 -- Insert SHOPPING_CART data
 INSERT INTO SHOPPING_CART (CID, CNumber, Cstatus) VALUES
-(1, 1, 'blocked'),
+(1, 1, 'active'),
 (1, 2, 'blocked'),
 (1, 3, 'blocked'),
 (1, 4, 'blocked'),
@@ -127,6 +127,8 @@ INSERT INTO PRIVATE_CODE (DCODE, DID, DTimestamp) VALUES
 -- Insert LOCKED_SHOPPING_CART data
 INSERT INTO LOCKED_SHOPPING_CART (LCID, Cart_number, CNumber, CTimestamp) VALUES
 (1, 1, 1, '2025-01-20 12:00:00'),
+(1, 1, 2, '2025-01-20 12:00:00'),
+(1, 1, 3, '2025-01-20 12:00:00'),
 (2, 2, 2, '2025-01-21 13:00:00'),
 (3, 3, 3, '2025-01-22 14:00:00'),
 (4, 4, 4, '2025-03-01 15:00:00'),
@@ -135,8 +137,8 @@ INSERT INTO LOCKED_SHOPPING_CART (LCID, Cart_number, CNumber, CTimestamp) VALUES
 -- Insert ISSUED_FOR data
 INSERT INTO ISSUED_FOR (ITracking_code, IID, ICart_number, ILocked_number) VALUES
 (1001, 1, 1, 1),
-(1006, 1, 1, 1),
-(1008, 1, 1, 1),
+(1006, 1, 1, 2),
+(1008, 1, 1, 3),
 (1002, 2, 2, 2),
 (1003, 3, 3, 3),
 (1004, 4, 4, 4),
@@ -153,13 +155,28 @@ INSERT INTO PEYSAZ.PRODUCT (ID, Category,Image, Current_price, Stock_count, Bran
 (7,'RAM', null , 79.99, 30, 'Corsair', 'Vengeance LPX 16GB'),
 (8,'RAM', null , 89.99, 25, 'G.Skill', 'Trident Z 16GB'),
 (9,'SSD', null ,99.99, 50, 'Samsung', '970 EVO 1TB'),
-(10,'Power Supply', null , 129.99, 15, 'Corsair', 'RM750'),
-(11,'Cooler', null , 59.99, 40, 'Noctua', 'NH-D15');
+(10,'Powersupply', null , 129.99, 15, 'Corsair', 'RM750'),
+(11,'RAM', null , 59.99, 40, 'BrandA', 'ModelA'),
+(12,'SSD', null , 59.99, 40, 'BrandB', 'ModelA'),
+(13,'GPU', null , 59.99, 40, 'BrandC', 'ModelB'),
+(14,'CPU', null , 59.99, 40, 'BrandA', 'ModelC'),
+(15,'Motherboard', null , 59.99, 40, 'BrandH', 'ModelC'),
+(16,'GPU', null , 59.99, 40, 'BrandF', 'ModelL'),
+(17,'RAM', null , 59.99, 40, 'BrandB', 'ModelO'),
+(18,'Powersupply', null , 59.99, 40, 'BrandS', 'ModelV'),
+(19,'Cooler', null , 59.99, 40, 'BrandZ', 'ModelQ'),
+(20,'Cooler', null , 59.99, 40, 'BrandH', 'ModelU');
+
+
 
 
 -- Insert ADDED_TO data
 INSERT INTO ADDED_TO (LCID, Cart_number, Locked_number, Product_ID, Quantity, Cart_price) VALUES
 (1, 1, 1, 1, 2, 1000),
+(1, 1, 2, 3, 2, 1500),
+(1, 1, 2, 5, 4, 100),
+(1, 1, 3, 10, 3, 560),
+(1, 1, 3, 8, 2, 470),
 (2, 2, 2, 2, 3, 900),
 (3, 3, 3, 3, 1, 700),
 (4, 4, 4, 4, 1, 1000),
@@ -173,28 +190,38 @@ INSERT INTO APPLIED_TO (LCID, Cart_number, Locked_number, ACODE, ATimestamp) VAL
 
 
 INSERT INTO PEYSAZ.COOLER (PID, Maximum_rotational_speed, Fan_size, Cooling_method, Wattage, Height, Width, Depth) VALUES
-(11, 1500, 140, 'Air', 8, 165, 150, 135);
+(19, 1500, 140, 'Air', 8, 165, 150, 135),
+(20, 4500, 150, 'Air', 8, 165, 150, 135);
+
 
 INSERT INTO PEYSAZ.POWER_SUPPLY (PID, Supported_wattage, Height, Width, Depth) VALUES
-(10, 750, 86, 150, 140);
+(10, 750, 86, 150, 140),
+(11, 740, 80, 150, 140),
+(18, 720, 90, 170, 120);
 
 INSERT INTO PEYSAZ.SSD (PID, Wattage, Capacity) VALUES
 (9, 5, 1000);
 INSERT INTO PEYSAZ.RAM_STICK (PID, Frequency, Generation, Wattage, Capacity, Height, Width, Depth) VALUES
 (7, 3200, 'DDR4', 10, 16, 5, 133, 34),
-(8, 3600, 'DDR4', 12, 16, 5, 133, 34);
+(8, 3600, 'DDR4', 12, 16, 5, 133, 34),
+(11, 4200, 'DDR5', 12, 16, 5, 133, 34),
+(17, 3600, 'DDR5', 12, 16, 5, 133, 34);
 
 INSERT INTO PEYSAZ.MOTHERBOARD (PID, Chipset, Memory_speed_range, Number_of_memory_slot, Wattage, Height, Width, Depth) VALUES
 (5, 'B550', 3200, 4, 75, 30, 244, 244),
-(6, 'Z690', 4800, 4, 85, 30, 244, 244);
+(6, 'Z690', 4800, 4, 85, 30, 244, 244),
+(15, 'HK610', 4800, 4, 85, 30, 244, 244);
 
 INSERT INTO PEYSAZ.PCPU (PID, Maximum_addressable_memory_limit, Boost_frequency, Base_frequency, Number_of_cores, Number_of_Threads, Microarchitecture, Generation, Wattage) VALUES
 (3, 128, 5000, 3600, 12, 24, 'Alder Lake', '12th Gen', 125),
-(4, 64, 4600, 3700, 6, 12, 'Zen 3', '5000 Series', 65);
+(4, 64, 4600, 3700, 6, 12, 'Zen 3', '5000 Series', 65),
+(14, 64, 5200, 3700, 6, 12, 'Zen 3', '5000 Series', 65);
 
 INSERT INTO PEYSAZ.GPU (PID, Clock_speed, Ram_size, Number_of_fans, Wattage, Height, Width, Depth) VALUES
 (1, 1800, 8, 2, 220, 50, 120, 250),
-(2, 1700, 16, 3, 250, 55, 125, 260);
+(2, 1700, 16, 3, 250, 55, 125, 260),
+(13, 1400, 19, 3, 250, 55, 125, 260),
+(16, 1500, 16, 3, 230, 55, 125, 260);
 
 
 INSERT INTO PEYSAZ.CONNECTOR_COMPATIBLE_WITH (GPU_ID, Power_ID) VALUES
@@ -214,5 +241,6 @@ INSERT INTO PEYSAZ.MC_SOCKET_COMPATIBLE_WITH (CPU_ID, Motherboard_ID) VALUES
 (4, 5);  -- Ryzen 5 5600X ↔️ B550-F
 
 INSERT INTO PEYSAZ.CC_SOCKET_COMPATIBLE_WITH (CPU_ID, Cooler_ID) VALUES
-(3, 11),  -- i7-12700K ↔️ NH-D15
-(4, 11);  -- Ryzen 5 5600X ↔️ NH-D15
+(3, 19),  -- i7-12700K ↔️ NH-D15
+(3, 20),
+(4, 20);  -- Ryzen 5 5600X ↔️ NH-D15
