@@ -40,7 +40,7 @@ BEGIN
         SET DiscountAmount = 50000;
     END IF;
 		
-        CALL Generate_Unique_Code(7, DiscountCode);
+        CALL Generate_Unique_Code(DiscountCode); -- what was 7??
     
 		-- Insert the discount code into the DISCOUNT_CODE 
 			INSERT INTO DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)

@@ -22,6 +22,7 @@ VALUES
 -- Insert ADDRESS data
 INSERT INTO ADDRESS (AID, Province, Remainder) VALUES
 (1, 'Province1', 'Address1'),
+(1, 'Hamedan', 'Address2'),
 (2, 'Province2', 'Address2'),
 (3, 'Province3', 'Address3'),
 (4, 'Province4', 'Address4'),
