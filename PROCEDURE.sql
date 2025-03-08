@@ -40,7 +40,7 @@ BEGIN
         SET DiscountAmount = 50000;
     END IF;
 		
-        CALL Generate_Unique_Code(DiscountCode); -- what was 7??
+        CALL Generate_Unique_Code(DiscountCode); 
     
 		-- Insert the discount code into the DISCOUNT_CODE 
 			INSERT INTO DISCOUNT_CODE (DCODE, Amount, DLimit, Usage_count, Expiration_date)
@@ -89,7 +89,7 @@ BEGIN
         SELECT ACODE 
         FROM APPLIED_TO AS apllied
         WHERE user_id = apllied.LCID AND shopping_cart_number = apllied.Cart_number AND locked_cart_number = apllied.Locked_Number 
-        ORDER BY apllied.ATimestamp; -- why apt.ATimestamp???
+        ORDER BY apllied.ATimestamp; 
         
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET endloop = TRUE;
  
@@ -98,7 +98,7 @@ BEGIN
     FROM ADDED_TO
     WHERE user_id = LCID AND locked_cart_number = Locked_Number AND shopping_cart_number = Cart_number;
 
-    SET final_price = total_price; -- why total_cart_price???
+    SET final_price = total_price; 
     
 
     OPEN code_list;

@@ -146,13 +146,13 @@ First_name     VARCHAR(15)  NOT NULL ,
 Last_name      VARCHAR(15)  NOT NULL ,
 Wallet_balance DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
 CTimestamp  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-Referral_code  CHAR(6) NOT NULL,     -- It can not be null!  
+Referral_code  CHAR(6) NOT NULL,     
 PRIMARY KEY (ID),
 UNIQUE (Phone_number));
 CREATE TABLE PEYSAZ.SHOPPING_CART (
 CID       INT         NOT NULL,
 CNumber   INT         NOT NULL,
-Cstatus   ENUM('active', 'blocked', 'locked') DEFAULT 'active',-- R check
+Cstatus   ENUM('active', 'blocked', 'locked') DEFAULT 'active',
 PRIMARY KEY (CID, CNumber),
 -- UNIQUE (CNumber),
 FOREIGN KEY (CID) REFERENCES COSTUMER(ID));
@@ -160,7 +160,7 @@ CREATE TABLE PEYSAZ.LOCKED_SHOPPING_CART (
 LCID        INT       NOT NULL,
 Cart_number INT       NOT NULL,
 CNumber     INT       NOT NULL,
-CTimestamp  DATETIME DEFAULT CURRENT_TIMESTAMP,  -- R TIMESTAMP?
+CTimestamp  DATETIME DEFAULT CURRENT_TIMESTAMP,  
 PRIMARY KEY (LCID, Cart_number, CNumber),
 FOREIGN KEY (LCID, Cart_number) REFERENCES SHOPPING_CART(CID, CNumber));
 CREATE TABLE PEYSAZ.ADDED_TO (
@@ -185,7 +185,7 @@ TTimestamp         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (Tracking_code));
 CREATE TABLE PEYSAZ.BANK_TRANSACTION (
 BTracking_code  CHAR(10)      NOT NULL ,
-Card_number     CHAR(12)      NOT NULL , -- INT constraint
+Card_number     CHAR(12)      NOT NULL , 
 PRIMARY KEY (BTracking_code) ,
 FOREIGN KEY (BTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.WALLET_TRANSACTION (
@@ -212,7 +212,7 @@ PRIMARY KEY (DTracking_code) ,
 FOREIGN KEY (DID) REFERENCES COSTUMER(ID) ,
 FOREIGN KEY (DTracking_code) REFERENCES TRANSACTIONS(Tracking_code));
 CREATE TABLE PEYSAZ.ISSUED_FOR (
-ITracking_code   CHAR(10)      NOT NULL ,  -- char?
+ITracking_code   CHAR(10)      NOT NULL ,  
 IID              INT           NOT NULL ,
 ICart_number     INT           NOT NULL ,
 ILocked_Number   INT           NOT NULL ,
@@ -221,7 +221,7 @@ FOREIGN KEY (ITracking_code) REFERENCES TRANSACTIONS(Tracking_code) ,
 FOREIGN KEY (IID, ICart_number, ILocked_Number) REFERENCES LOCKED_SHOPPING_CART(LCID, Cart_number, CNumber));
 CREATE TABLE PEYSAZ.DISCOUNT_CODE (
 DCODE         CHAR(7)     NOT NULL ,
-Amount        INT     NOT NULL , -- CHECK
+Amount        INT     NOT NULL , 
 DLimit        INT     NOT NULL ,
 Usage_count   INT     NOT NULL ,
 Expiration_date       DATETIME ,
